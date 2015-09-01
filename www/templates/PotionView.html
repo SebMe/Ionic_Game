@@ -1,8 +1,8 @@
-<script type="text/ng-template" id="potionView.html">
-    <ion-view>
-        <ion-content padding="true">
-            <h2>Home Page</h2>
-            <p>Here's the main route for the app.</p>
-        </ion-content>
-    </ion-view>
-</script>
+<!-- The potion view, displays some potion images as list-->
+<ion-view ng-controller="potionViewController">
+    <a ng-repeat="potion in discoveredPotions" class="item item-thumbnail-left" href="#">
+        <img src="img/{{potion.image}}">
+        <h2>{{potion.name}}</h2>
+        <p>{{potion.description}}</p>
+    </a>
+</ion-view>
