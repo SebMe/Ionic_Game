@@ -1,0 +1,6 @@
+﻿<ion-view ng-controller="potionDiscoveryViewController">   
+    <!-- ng-show is workaround, ng-src with an empty path wont remove the image, when ng-show = false it is not shown-->
+     <img ng-src="img/{{potion.image}}" ng-show="potion.image" style="margin-top:100px; margin-left:auto; margin-right:auto; display: block"/>
+    <h1 align="center">{{potion.name}}</h1>
+    <p align="center">{{potion.description}}</p>
+</ion-view>
