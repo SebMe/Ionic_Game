@@ -58,62 +58,21 @@ myApp.config(function ($stateProvider, $urlRouterProvider) {
 })
 
 
-// Needed variables used in the controllers
-var potions = [PotionOfBeginning, PotionOfDay];
-// Variable ist nur gefüllt wenn der controller sie füllt, danach für jeden aufruf leer!! - verständnis für "globale" variablen fehlt
+// List of all implemented potions
+var potions = [PotionOfBeginning, PotionOfDay, PotionOfTouch];
+
+// This field is filled in potionDiscoveryController each time a new potion is discovered and used in the other controllers to display the values in views
+// For init the info of already discovered potions is retrieved from harddrive
 var discoveredPotions = [];
-
-myApp.controller('potionViewController', function($scope){
-    $scope.$on('$ionicView.enter', function () {
-        $scope.discoveredPotions = discoveredPotions;
-    });
-})
-
-myApp.controller('homeViewController', function ($scope) {
-    $scope.$on('$ionicView.enter', function () {
-        $scope.potions = potions;
-        $scope.discoveredPotions = discoveredPotions;
-
-        // Debug purposes only
-        window.localStorage[PotionOfDay.name] = 'false';
-        window.localStorage[PotionOfBeginning.name] = 'false';
-        discoveredPotions = [];
-    });
-})
-
-myApp.controller('potionDiscoveryViewController', function ($scope, $interval) {
-    $scope.$on('$ionicView.enter', function () {
-    var newlyDiscoveredPotions = [];
-
-    // Potion of Beginning    
-    var potionOfBeginningDiscovered = window.localStorage[PotionOfBeginning.name];
-    if (potionOfBeginningDiscovered != 'true') {
-        discoveredPotions.push(PotionOfBeginning);
-        newlyDiscoveredPotions.push(PotionOfBeginning);
-        window.localStorage[PotionOfBeginning.name] = 'true';
+for (var i = 0; i < potions.length; i++) {
+    var potionDiscovered = window.localStorage[potions[i].name];
+    if (potionDiscovered == 'true') {
+        discoveredPotions.push(potions[i]);
     }
+}
 
-    // Potion Of Day 
-    var potionOfDayDiscovered = window.localStorage[PotionOfDay.name];
-    var currentHour = (new Date).getHours();
-    var itIsDaytime = currentHour >= 8 && currentHour <= 20;
-    if (itIsDaytime && potionOfDayDiscovered != 'true') {
-        newlyDiscoveredPotions.push(PotionOfDay);
-        discoveredPotions.push(PotionOfDay);
-        window.localStorage[PotionOfDay.name] = 'true';
-    }
 
-    // Show the newly discovered potions
-    var index = 0;
-    var showNewlyDiscoveredPotions = $interval(function (index) {
-        if (index < newlyDiscoveredPotions.length) {
-            $scope.potion = newlyDiscoveredPotions[index];
-        } else {
-            $scope.potion = null; // After the last discovered potion is shown the screen will be empty again (no potion displayed)
-            $interval.cancel(showNewlyDiscoveredPotions);
-        }
-    }, 1500);
-    });
-})
+
+
     
 
