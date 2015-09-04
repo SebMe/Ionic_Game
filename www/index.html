@@ -15,11 +15,14 @@
     <!-- ionic/angularjs js -->
     <script src="lib/ionic/js/ionic.bundle.js"></script>
 
-    <!-- cordova script (this will be a 404 during development) -->
-    <script src="cordova.js"></script>
 
     <!-- your app's js -->
-     <script src="js/DataStructures/potionDefinitions.js"></script> <!-- since this file is used in the app.js file, it has to be included before it! -->
+      <script src="js/database/tableDefinitions.js"></script>
+      <script src="js/DataStructures/potionDefinitions.js"></script> <!-- since this file is used in the app.js file, it has to be included before it! -->
+      <script src="js/ng-cordova.min.js"></script>
+      <script src="cordova.js"></script>
+
+      <script src="js/database/initTableContentScripts.js"></script>
       <script src="js/app.js"></script>
       <script src="js/ViewController/homeViewController.js"></script>  <!-- since this file uses the variable myApp, defined in app.js, it has to be included after app.js! -->
       <script src="js/ViewController/potionViewController.js"></script>
@@ -32,7 +35,10 @@
         http://ionicframework.com/docs/components/
         http://learn.ionicframework.com/formulas/navigation-and-routing-part-1/
         http://ionicframework.com/docs/api/directive/ionView/
-        
+       
+        USEFUL SQLite
+        https://blog.nraboy.com/2014/11/use-sqlite-instead-local-storage-ionic-framework/
+                
         USEFUL AngularJS:
         https://www.youtube.com/watch?v=tnXO-i7944M
         https://docs.angularjs.org/tutorial/step_00
@@ -45,6 +51,9 @@
 
         USEFUL ADB/Driver Problems
         http://developer.android.com/tools/extras/oem-usb.html
+
+        USEFUL Android Debugging
+        http://developer.android.com/tools/debugging/ddms.html
         -->
 
   <body ng-app="starter">
