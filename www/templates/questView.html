@@ -1,0 +1,10 @@
+<!-- The quest view, displays all quests as list-->
+<ion-view ng-controller="questViewController">
+    <a ng-repeat="quest in allQuests" class="item item-thumbnail-left" href="#">
+        <h2>{{quest.Name}}</h2>
+        <p>{{quest.Description}}</p>
+        <p>Type: {{quest.Type}}</p>
+        <p>Reward Money: {{quest.Rewardmoney}}</p>
+        <p> Reward Potion: {{quest.RewardPotion[0].Name}}</p>            
+    </a>
+</ion-view>

@@ -1,5 +1,7 @@
-myApp.controller('potionViewController', function ($scope) {
+myApp.controller('potionViewController', function ($scope, $cordovaSQLite, dataGetterSetter) {
     $scope.$on('$ionicView.enter', function () {
-        $scope.discoveredPotions = discoveredPotions;
+        dataGetterSetter.getAllExistingPotions($cordovaSQLite).then(function (values) {
+            $scope.allPotions = values;
+        });        
     });
 })
