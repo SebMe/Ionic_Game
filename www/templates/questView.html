@@ -5,6 +5,8 @@
         <p>{{quest.Description}}</p>
         <p>Type: {{quest.Type}}</p>
         <p>Reward Money: {{quest.Rewardmoney}}</p>
-        <p> Reward Potion: {{quest.RewardPotion[0].Name}}</p>            
+        <p ng-repeat="rewardPotion in quest.RewardPotions"> Reward Potion: {{rewardPotion.RewardAmount}} x {{rewardPotion.Name}}</p> 
+        <p ng-repeat="requiredPotion in quest.RequiredPotions"> Required Potion: {{requiredPotion.AmountNeeded}} x {{requiredPotion.Name}}</p> 
+        <p ng-repeat="requiredDiscovery in quest.Discoveries"> Required Discovery: {{requiredDiscovery.Name}}</p>           
     </a>
 </ion-view>

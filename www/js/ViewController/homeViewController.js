@@ -1,25 +1,63 @@
-myApp.controller('homeViewController', function ($scope, $cordovaSQLite, dataGetterSetter) {
+myApp.controller('homeViewController', function ($scope, $cordovaSQLite, databaseFunctions) {
 
     $scope.$on('$ionicView.enter', function () {
-        $scope.potions = potions;
-        $scope.discoveredPotions = discoveredPotions;
+
+        $scope.info = 'View betreten';
+
     });
 
-    $scope.insert = function () {
-        databaseInit.create($cordovaSQLite);
-        databaseInit.fill($cordovaSQLite);
+    $scope.incGold = function () {
+        databaseFunctions.getUser($cordovaSQLite).then(function (values) {
+            values.AmountOfGold += 100;
+            $scope.info = values;
+            databaseFunctions.updateAllUserData($cordovaSQLite, values);
+        });
     };
     
-    $scope.select = function () {
-
-        /*var q = $q.defer()
-         q.resolve('bla');
-         return q.promise;*/
-
-        dataGetterSetter.getAllExistingQuests($cordovaSQLite).then(function (values) {
-            var test = values;
-            test[0].Rewardmoney = 50;
-            $scope.info = test[0];
+    $scope.incPotionAmount = function () {
+        databaseFunctions.getUser($cordovaSQLite).then(function (values) {
+            values.OwnedPotions[1].Amount++;
+            $scope.info = values;
+            databaseFunctions.updateAllUserData($cordovaSQLite, values);
         });
+    };
+
+    $scope.addPotion = function () {
+        databaseFunctions.getUser($cordovaSQLite).then(function (values) {
+            // The potion with ID 2 is not in the user.ownedPotion list, so we add id - if it were already in list we could just amount++
+            databaseFunctions.getAllExistingPotions($cordovaSQLite).then(function (allPotions) {
+                var potionValues = {
+                    ID: null,
+                    Rank: null,
+                    Name: null,
+                    Description: null,
+                    Price: null,
+                    Class: null,
+                    ImageFilename: null,
+                    Amount: null
+                };
+                values.OwnedPotions.push(allPotions[1]); // allPotions[1] has ID = 2
+                $scope.info = values;
+                databaseFunctions.updateAllUserData($cordovaSQLite, values);
+            });          
+        });
+    };
+    
+    $scope.test = function () {
+        databaseFunctions.getUser($cordovaSQLite).then(function (values) {
+            var quest = {
+                ID: 1,
+                Name: null,
+                Description: null,
+                Rewardmoney: null,
+                Type: null,
+                RewardPotions: [],
+                RequiredPotions: [],
+                Discoveries: []
+            };
+            values.SolvedQuests.push(quest);
+            $scope.info = values.SolvedQuests;
+            databaseFunctions.updateAllUserData($cordovaSQLite, values);
+        });       
     };
 });
