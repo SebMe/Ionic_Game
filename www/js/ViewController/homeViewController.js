@@ -3,7 +3,6 @@ myApp.controller('homeViewController', function ($scope, $cordovaSQLite, databas
     $scope.$on('$ionicView.enter', function () {
 
         $scope.info = 'View betreten';
-
     });
 
     $scope.incGold = function () {
@@ -25,25 +24,23 @@ myApp.controller('homeViewController', function ($scope, $cordovaSQLite, databas
     $scope.addPotion = function () {
         databaseFunctions.getUser($cordovaSQLite).then(function (values) {
             // The potion with ID 2 is not in the user.ownedPotion list, so we add id - if it were already in list we could just amount++
-            databaseFunctions.getAllExistingPotions($cordovaSQLite).then(function (allPotions) {
                 var potionValues = {
-                    ID: null,
+                    ID: 2,
                     Rank: null,
                     Name: null,
                     Description: null,
                     Price: null,
                     Class: null,
                     ImageFilename: null,
-                    Amount: null
+                    Amount: 2
                 };
-                values.OwnedPotions.push(allPotions[1]); // allPotions[1] has ID = 2
-                $scope.info = values;
-                databaseFunctions.updateAllUserData($cordovaSQLite, values);
-            });          
+                values.OwnedPotions.push(potionValues);
+                $scope.info = values.OwnedPotions;
+                databaseFunctions.updateAllUserData($cordovaSQLite, values);        
         });
     };
     
-    $scope.test = function () {
+    $scope.addQuest = function () {
         databaseFunctions.getUser($cordovaSQLite).then(function (values) {
             var quest = {
                 ID: 1,

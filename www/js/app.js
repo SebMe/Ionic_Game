@@ -43,7 +43,7 @@ var myApp = angular.module('starter', ['ionic', 'ngCordova'])
         // Create all tables
         $cordovaSQLite.execute(db, 'CREATE TABLE IF NOT EXISTS Potion_Table(ID INTEGER PRIMARY KEY AUTOINCREMENT, Rank INTEGER, Name TEXT, Description TEXT, Price INTEGER, Class TEXT, ImageFilename TEXT)');
         $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS User_Table(ID INTEGER PRIMARY KEY AUTOINCREMENT, AmountOfGold INTEGER, CurrentLevel INTEGER)");
-        $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS Userpotion_Table(User_TableID INTEGER, Potion_TableID INTEGER, Amount INTEGER)");
+        $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS Userpotion_Table(User_TableID INTEGER, Potion_TableID INTEGER, Amount INTEGER, UNIQUE(User_TableID, Potion_TableID))");
         $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS Discovery_Table(ID INTEGER PRIMARY KEY AUTOINCREMENT, FunctionName TEXT, Description TEXT, Name TEXT)");
         $cordovaSQLite.execute(db, 'CREATE TABLE IF NOT EXISTS Quest_Table(ID INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT, Description TEXT, Rewardmoney INTEGER, Type TEXT)');
         $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS SolvedQuests_Table(User_TableID INTEGER, Quest_TableID INTEGER)");

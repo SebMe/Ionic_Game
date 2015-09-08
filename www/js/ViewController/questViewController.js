@@ -1,6 +1,6 @@
-myApp.controller('questViewController', function ($scope, $cordovaSQLite, dataGetterSetter) {
+myApp.controller('questViewController', function ($scope, $cordovaSQLite, databaseFunctions) {
     $scope.$on('$ionicView.enter', function () {
-        dataGetterSetter.getAllExistingQuests($cordovaSQLite).then(function (values) {
+        databaseFunctions.getAllExistingQuests($cordovaSQLite).then(function (values) {
             $scope.allQuests = values;
         });
     });
