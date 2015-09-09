@@ -1,7 +1,9 @@
-myApp.controller('traderViewController', function ($scope, $cordovaSQLite, databaseFunctions) {
-
+myApp.controller('traderViewController', function ($scope, $cordovaSQLite, $cordovaNativeAudio, $timeout, databaseFunctions) {
     $scope.$on('$ionicView.enter', function () {
         databaseFunctions.getUser($cordovaSQLite).then(function (user) {
+            // Preload sounds that can be used in the view
+            $cordovaNativeAudio.preloadSimple('moneySound', 'sounds/money.mp3')
+
             $scope.userAmountOfGold = user.AmountOfGold;
         });
         
@@ -33,7 +35,6 @@ myApp.controller('traderViewController', function ($scope, $cordovaSQLite, datab
         databaseFunctions.getUser($cordovaSQLite).then(function (user) {
             // Potion retrieved from the Potions_Table has no Amount field, need to add Amount since a potion the user possesses has an Amount
             potion.Amount = 1;
-
             if (user.AmountOfGold - potion.Price >= 0) {
                 if (typeof user.OwnedPotions != 'undefined') { // If the user has no potions, the OwnedPotions field does not exist and is 'undefined'                 
                     var addedPotion = false;
@@ -56,7 +57,11 @@ myApp.controller('traderViewController', function ($scope, $cordovaSQLite, datab
                     user.OwnedPotions.push(potion);
                     user.AmountOfGold -= potion.Price;
                 };
-                
+
+                $scope.traderImage = 'TraderReaction.png'
+                $timeout(function () {
+                    $scope.traderImage = 'Trader.png';
+                }, 500);
             };
             $scope.userAmountOfGold = user.AmountOfGold;
             databaseFunctions.updateAllUserData($cordovaSQLite, user);
@@ -70,6 +75,12 @@ myApp.controller('traderViewController', function ($scope, $cordovaSQLite, datab
                     if (potion.ID == user.OwnedPotions[i].ID && user.OwnedPotions[i].Amount > 0) {
                         user.OwnedPotions[i].Amount--;
                         user.AmountOfGold += potion.Price;
+                        // Play a Money Sound (is native, so has to be commented out for app to still work while pc-testing in chrome)
+                        $cordovaNativeAudio.play('moneySound');
+                        $scope.traderImage = 'TraderReaction.png'
+                        $timeout(function () {
+                            $scope.traderImage = 'Trader.png';
+                        }, 500);                       
                     };
                 };
                 $scope.userAmountOfGold = user.AmountOfGold;
