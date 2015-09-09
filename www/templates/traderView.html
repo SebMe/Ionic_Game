@@ -1,3 +1,29 @@
-<ion-view name="name_traderView">
-to do
+<ion-view ng-controller="traderViewController">
+<tabs>
+    <ion-tab icon="ion-erlenmeyer-flask" ui-sref="state_PotionViewDisplayed" hidden="true">
+        <ion-nav-view name="name_potionView"></ion-nav-view>
+    </ion-tab>
+</tabs>
+     
+     <img src="img/Trader.png" style="width:100%;">
+
+
+    <h3 style="margin-left: 40%;"> {{userAmountOfGold}} Gold</h3>
+    <button style="height: 50px; width: 43%; margin-top: 2%; margin-left: 5%;" ng-click="showPotionsToBuy()">
+        Buy
+    </button>
+    <button style="height: 50px; width: 43%; margin-top: 2%; margin-left: 5%;" ng-click="showAllUserpotions()">
+        Sell
+    </button>
+
+    <ion-scroll zooming="true" direction="y" style="width: 100%; height: 50%">
+        <a ng-repeat="potion in listOfPotions | orderBy:'Class' " class="item item-thumbnail-left" style="margin-left:5%; margin-right:5%; margin-top:5%; border: none; border-bottom:groove" ng-click="processPotion(potion)">
+            <img src="img/{{potion.ImageFilename}}">
+            <h2>{{potion.Amount + ' ' + potion.Name}}</h2>
+            <p>{{potion.Description}}</p>
+            <p>Rank: {{potion.Rank}}</p>
+            <p>Price: {{potion.Price}}</p>
+        </a>
+     </ion-scroll>
+
 </ion-view>
