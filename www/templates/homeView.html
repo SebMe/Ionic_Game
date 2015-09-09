@@ -1,22 +1,15 @@
-<!-- The home view, only displays the ionic logo-->
 <ion-view ng-controller="homeViewController">
+    <div style="margin-top: 30%; margin-left: 20%">
+        <button style="display: block; height: 50px; width: 80%; margin-top: 2%" ui-sref="state_ProfessorViewDisplayed">
+            Professor
+        </button>
 
-    <button ng-click="incGold()">
-        inc gold   
-    </button>
+        <button style="display: block; height: 50px; width: 80%; margin-top: 2%" ui-sref="state_TraderViewDisplayed">
+            Trader
+        </button>
 
-    <button ng-click="addPotion()">
-        add a potion
-    </button>
-    
-    <button ng-click="incPotionAmount()">
-        inc Potion Amount
-    </button>
-
-    <button ng-click="addQuest()">
-        addQuest
-    </button>
-
-    <p>{{info}}</p>
-
+        <button style="display: block; height: 50px; width: 80%; margin-top: 2%" ui-sref="state_TestViewDisplayed">
+            Test
+        </button>
+    </div>
 </ion-view>

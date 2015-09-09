@@ -46,10 +46,10 @@ var myApp = angular.module('starter', ['ionic', 'ngCordova'])
         $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS Userpotion_Table(User_TableID INTEGER, Potion_TableID INTEGER, Amount INTEGER, UNIQUE(User_TableID, Potion_TableID))");
         $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS Discovery_Table(ID INTEGER PRIMARY KEY AUTOINCREMENT, FunctionName TEXT, Description TEXT, Name TEXT)");
         $cordovaSQLite.execute(db, 'CREATE TABLE IF NOT EXISTS Quest_Table(ID INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT, Description TEXT, Rewardmoney INTEGER, Type TEXT)');
-        $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS SolvedQuests_Table(User_TableID INTEGER, Quest_TableID INTEGER)");
-        $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS RequiredQuestDiscovery_Table(Quest_TableID INTEGER, Discovery_TableID INTEGER)");
-        $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS RequiredQuestPotion_Table(Quest_TableID INTEGER, Potion_TableID INTEGER, AmountNeeded INTEGER)");
-        $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS RewardQuestPotion_Table(Quest_TableID INTEGER, Potion_TableID INTEGER, RewardAmount INTEGER)");
+        $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS SolvedQuests_Table(User_TableID INTEGER, Quest_TableID INTEGER, UNIQUE(User_TableID, Quest_TableID))");
+        $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS RequiredQuestDiscovery_Table(Quest_TableID INTEGER, Discovery_TableID INTEGER, UNIQUE(Quest_TableID, Discovery_TableID))");
+        $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS RequiredQuestPotion_Table(Quest_TableID INTEGER, Potion_TableID INTEGER, AmountNeeded INTEGER, UNIQUE(Quest_TableID, Potion_TableID))");
+        $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS RewardQuestPotion_Table(Quest_TableID INTEGER, Potion_TableID INTEGER, RewardAmount INTEGER, UNIQUE(Quest_TableID, Potion_TableID))");
 
         // Init the tables with values
         // fill PotionTable
@@ -68,7 +68,7 @@ var myApp = angular.module('starter', ['ionic', 'ngCordova'])
         $cordovaSQLite.execute(db, query, [3000, 1]);
 
         // fill UserpotionTable
-        var query = "INSERT INTO Userpotion_Table (User_TableID, Potion_TableID, Amount) VALUES (?, ?, ?)";
+        var query = "INSERT INTO Userpotion_Table (User_TableID, Potion_TableID, Amount) VALUES (?, ?, ?)";     
         $cordovaSQLite.execute(db, query, [1, 1, 5]);
         $cordovaSQLite.execute(db, query, [1, 3, 3]);
         $cordovaSQLite.execute(db, query, [1, 4, 3]);
@@ -151,6 +151,33 @@ myApp.config(function ($stateProvider, $urlRouterProvider) {
         views: {
             name_questView: {
                 templateUrl: 'templates/questView.html'
+            }
+        }
+    });
+
+    $stateProvider.state('state_TraderViewDisplayed', {
+        url: '/trader',
+        views: {
+            name_traderView: {
+                templateUrl: 'templates/traderView.html'
+            }
+        }
+    });
+
+    $stateProvider.state('state_ProfessorViewDisplayed', {
+        url: '/professor',
+        views: {
+            name_professorView: {
+                templateUrl: 'templates/professorView.html'
+            }
+        }
+    });
+
+    $stateProvider.state('state_TestViewDisplayed', {
+        url: '/test',
+        views: {
+            name_testView: {
+                templateUrl: 'templates/testView.html'
             }
         }
     });

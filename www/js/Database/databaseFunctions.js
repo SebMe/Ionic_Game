@@ -385,7 +385,7 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
 
     // Functions to update the db data    
     this.updateAllUserData = function ($cordovaSQLite, userData) {
-
+        
         // Update the User_Table
         var update_user_query = 'UPDATE User_Table SET AmountOfGold = ?, CurrentLevel = ? WHERE ID = ?';
         this.executeQuery(update_user_query, [userData.AmountOfGold, userData.CurrentLevel, userData.ID]);
@@ -394,32 +394,34 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
         // Update the Userpotion_Table
         var insert_userpotions_query = 'INSERT OR IGNORE INTO Userpotion_Table (User_TableID, Potion_TableID) VALUES (?, ?)';  // the IGNORE only works on primary key or unique constraints
         var update_userpotions_query = 'UPDATE Userpotion_Table SET Amount = ? WHERE User_TableID = ? AND Potion_TableID = ?';
-        var delete_userpotions_query = 'DELETE FROM Userpotion_Table WHERE User_TableID = ? AND Potion_TableID = ?';
-        //$cordovaSQLite.execute(db, insert_userpotions_query, [1, 2]);
-        
-        for (var i = 0; i < userData.OwnedPotions.length; i++) {
+        var delete_userpotions_query = 'DELETE FROM Userpotion_Table WHERE User_TableID = ? AND Potion_TableID = ?';      
+        var potionTableLength = 0;
+        if (typeof userData.OwnedPotions != 'undefined') {
+            potionTableLength += userData.OwnedPotions.length;
+        };
+        for (var i = 0; i < potionTableLength; i++) {
             var userID = userData.ID;
             var potionID = userData.OwnedPotions[i].ID;
             var potionAmount = userData.OwnedPotions[i].Amount;
             if (potionAmount > 0) {
-                this.executeQuery(insert_userpotions_query, [userID, potionID]).then(function () {
-                   //$cordovaSQLite.execute(db, update_userpotions_query, [potionAmount, userID, potionID]);
-                });
+                $cordovaSQLite.execute(db, insert_userpotions_query, [userID, potionID]);
                 $cordovaSQLite.execute(db, update_userpotions_query, [potionAmount, userID, potionID]);
             } else {
-                //$cordovaSQLite.execute(db, delete_userpotions_query, [userID, potionID]);
+                $cordovaSQLite.execute(db, delete_userpotions_query, [userID, potionID]);
             };
         };
-       
-        /*
+        
         // Update the SolvedQuests_Table
-        var delete_userquests_query = 'DELETE FROM SolvedQuests_Table WHERE User_TableID = ?';
-        var insert_userquests_query = 'INSERT INTO SolvedQuests_Table (User_TableID, Quest_TableID) VALUES (?, ?)';
-        this.executeQuery(delete_userquests_query, [userData.ID]).then(function (result) {
-            for (var i = 0; i < userData.SolvedQuests.length; i++) {
-                $cordovaSQLite.execute(db, insert_userquests_query, [userData.ID, userData.SolvedQuests[i].ID]);
-            };
-        });*/
+        var insert_userquests_query = 'INSERT OR IGNORE INTO SolvedQuests_Table (User_TableID, Quest_TableID) VALUES (?, ?)';
+        var userID = userData.ID;
+        var questCount = 0;
+        if (typeof userData.SolvedQuests != 'undefined') {
+            questCount += userData.SolvedQuests.length;
+        };
+        for (var i = 0; i < questCount; i++) {
+            var solvedQuestID = userData.SolvedQuests[i].ID;
+            $cordovaSQLite.execute(db, insert_userquests_query, [userID, solvedQuestID]);
+        };
     };
 
     return this;
