@@ -1,4 +1,54 @@
 /* Empty. Add your own CSS if you like */
+/*
 button{
-	
+	background-image: url("/img/ButtonBackground.png");
+    background-repeat: none;
+    background-size: cover;
+    background-position:center;
+    border: none;
+}*/
+
+.homeBackground {
+    background: url('../img/Background.png') no-repeat;
+    position: absolute; 
+    height: 100%; 
+    width: 100%;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-position: 50% 50%; 
+    -webkit-background-size: cover; 
+    -moz-background-size: cover; 
+    background-size: cover;
+}
+
+.professor {
+    background: url('../img/Professor.png') no-repeat;
+    position: absolute; 
+    height: 100%; 
+    width: 100%;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-position: 50% 50%; 
+    -webkit-background-size: cover; 
+    -moz-background-size: cover; 
+    background-size: cover;
+}
+
+.homeCastle {
+    background: url('../img/HomeCastle.png') no-repeat;
+    position: absolute; 
+    height: 100%; 
+    width: 100%;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background-position: 50% 50%; 
+    -webkit-background-size: cover; 
+    -moz-background-size: cover; 
+    background-size: cover;
 }

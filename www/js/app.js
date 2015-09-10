@@ -82,6 +82,7 @@ var myApp = angular.module('starter', ['ionic', 'ngCordova'])
         // fill QuestTable
         var query = "INSERT INTO Quest_Table (Name, Description, RewardMoney, Type) VALUES (?, ?, ?, ?)";
         $cordovaSQLite.execute(db, query, ["First small Quest", "Your first small quest", 300, "small"]);
+        $cordovaSQLite.execute(db, query, ["Second small Quest", "For this you need to upgrade", 500, "small"]);
         $cordovaSQLite.execute(db, query, ["First Big Quest", "Your first big quest", 1000, "big"]);
         $cordovaSQLite.execute(db, query, ["Mighty Quest", "A mighty quest", 1500, "big"]);
 
@@ -178,6 +179,24 @@ myApp.config(function ($stateProvider, $urlRouterProvider) {
         views: {
             name_testView: {
                 templateUrl: 'templates/testView.html'
+            }
+        }
+    });
+  
+    $stateProvider.state('state_UpgradePotionViewDisplayed', {
+        url: '/upgradePotion',
+        views: {
+            name_upgradePotionView: {
+                templateUrl: 'templates/upgradePotionView.html'
+            }
+        }
+    });
+
+    $stateProvider.state('state_OpenQuestsViewDisplayed', {
+        url: '/openQuests',
+        views: {
+            name_openQuestsView: {
+                templateUrl: 'templates/openQuestsView.html'
             }
         }
     });

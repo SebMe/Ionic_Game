@@ -1,17 +1,11 @@
 <!-- The home view, only displays the ionic logo-->
-<ion-view ng-controller="homeViewController">
-     <div style="margin-top: 30%; margin-left: 20%">
-         <button style="display: block; height: 50px; width: 80%; margin-top: 2%">
-             Upgrade Potion
-         </button>
-         <button style="display: block; height: 50px; width: 80%; margin-top: 2%">
-             Solve Quest 
-         </button>
-          <button style="display: block; height: 50px; width: 80%; margin-top: 2%" ui-sref="state_QuestViewDisplayed">
-            List of Quests
-        </button>
-         <button style="display: block; height: 50px; width: 80%; margin-top: 2%">
-             Discovery Modus
-         </button>
+<ion-view ng-controller="homeViewController" class="professor">
+    <div>
+        <div style="margin-top: 10%; margin-left: 70%; height: 100%">
+            <img src="img/UpgradePotion.png" style="display: block; width: 70%; margin-top: 10%;" ui-sref="state_UpgradePotionViewDisplayed" />
+            <img src="img/SolveQuest.png" style="display: block; width: 70%; margin-top: 20%;" ui-sref="state_OpenQuestsViewDisplayed"/>
+            <img src="img/ListOfQuests.png" style="display: block; width: 70%; margin-top: 20%;" ui-sref="state_QuestViewDisplayed">
+            <img src="img/DiscoveryModus.png" style="display: block; width: 70%; margin-top: 20%;" ui-sref="state_PotionDiscoveryViewDisplayed">
+        </div>
     </div>
 </ion-view>

@@ -1,18 +1,19 @@
 myApp.controller('traderViewController', function ($scope, $cordovaSQLite, $cordovaNativeAudio, $timeout, databaseFunctions) {
     $scope.$on('$ionicView.enter', function () {
-        databaseFunctions.getUser($cordovaSQLite).then(function (user) {
-            // Preload sounds that can be used in the view
-            $cordovaNativeAudio.preloadSimple('moneySound', 'sounds/money.mp3')
-
+        databaseFunctions.getUser($cordovaSQLite).then(function (user) {            
             $scope.userAmountOfGold = user.AmountOfGold;
         });
-        
+
+        // Preload sounds that can be used in the view
+        $cordovaNativeAudio.preloadSimple('moneySound', 'sounds/money.mp3');
     });
 
     $scope.showPotionsToBuy = function () {
         databaseFunctions.getAllExistingPotions($cordovaSQLite).then(function (allPotions) {
             $scope.listOfPotions = allPotions;
             $scope.action = 'buy';
+            $scope.buyBorder = 'dashed';
+            $scope.sellBorder = 'none';
         });
     };
 
@@ -20,6 +21,8 @@ myApp.controller('traderViewController', function ($scope, $cordovaSQLite, $cord
         databaseFunctions.getUser($cordovaSQLite).then(function (user) {
             $scope.listOfPotions = user.OwnedPotions;
             $scope.action = 'sell';
+            $scope.sellBorder = 'dashed';
+            $scope.buyBorder = 'none';
         });
     };
     
