@@ -6,7 +6,7 @@
 var db = null;
 
 var myApp = angular.module('starter', ['ionic', 'ngCordova'])
-.run(function ($ionicPlatform, $cordovaSQLite) {
+.run(function ($ionicPlatform, $cordovaSQLite, $q) {
     $ionicPlatform.ready(function () {
         // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
         // for form inputs)
@@ -28,8 +28,8 @@ var myApp = angular.module('starter', ['ionic', 'ngCordova'])
             db = window.openDatabase("myapp.db", "1.0", "MyAppInfo", -1);
         }
 
-
-        // Delete existing tables, so the init (see below) doesnt create multiple values if run a second time)
+        
+        // Delete existing tables, if changes were made to a table
         $cordovaSQLite.execute(db, 'DROP TABLE Potion_Table');
         $cordovaSQLite.execute(db, 'DROP TABLE User_Table');
         $cordovaSQLite.execute(db, 'DROP TABLE Userpotion_Table');
@@ -39,73 +39,196 @@ var myApp = angular.module('starter', ['ionic', 'ngCordova'])
         $cordovaSQLite.execute(db, 'DROP TABLE RequiredQuestDiscovery_Table');
         $cordovaSQLite.execute(db, 'DROP TABLE RequiredQuestPotion_Table');
         $cordovaSQLite.execute(db, 'DROP TABLE RewardQuestPotion_Table');
-
+        $cordovaSQLite.execute(db, 'DROP TABLE FoundDiscoveries_Table');
+        
         // Create all tables
-        $cordovaSQLite.execute(db, 'CREATE TABLE IF NOT EXISTS Potion_Table(ID INTEGER PRIMARY KEY AUTOINCREMENT, Rank INTEGER, Name TEXT, Description TEXT, Price INTEGER, Class TEXT, ImageFilename TEXT)');
-        $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS User_Table(ID INTEGER PRIMARY KEY AUTOINCREMENT, AmountOfGold INTEGER, CurrentLevel INTEGER)");
+        $cordovaSQLite.execute(db, 'CREATE TABLE IF NOT EXISTS Potion_Table(ID INTEGER PRIMARY KEY AUTOINCREMENT, Rank INTEGER, Name TEXT, Description TEXT, Price INTEGER, Class TEXT, ImageFilename TEXT, UNIQUE(Rank, Class))');
+        $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS User_Table(ID INTEGER PRIMARY KEY AUTOINCREMENT, AmountOfGold INTEGER, CurrentLevel INTEGER, Name TEXT, UNIQUE(Name))");
         $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS Userpotion_Table(User_TableID INTEGER, Potion_TableID INTEGER, Amount INTEGER, UNIQUE(User_TableID, Potion_TableID))");
-        $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS Discovery_Table(ID INTEGER PRIMARY KEY AUTOINCREMENT, FunctionName TEXT, Description TEXT, Name TEXT)");
-        $cordovaSQLite.execute(db, 'CREATE TABLE IF NOT EXISTS Quest_Table(ID INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT, Description TEXT, Rewardmoney INTEGER, Type TEXT)');
+        $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS Discovery_Table(ID INTEGER PRIMARY KEY AUTOINCREMENT, Description TEXT, Name TEXT, UNIQUE(Name))");
+        $cordovaSQLite.execute(db, 'CREATE TABLE IF NOT EXISTS Quest_Table(ID INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT, Description TEXT, Rewardmoney INTEGER, Type TEXT, UNIQUE(Name))');
         $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS SolvedQuests_Table(User_TableID INTEGER, Quest_TableID INTEGER, UNIQUE(User_TableID, Quest_TableID))");
         $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS RequiredQuestDiscovery_Table(Quest_TableID INTEGER, Discovery_TableID INTEGER, UNIQUE(Quest_TableID, Discovery_TableID))");
         $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS RequiredQuestPotion_Table(Quest_TableID INTEGER, Potion_TableID INTEGER, AmountNeeded INTEGER, UNIQUE(Quest_TableID, Potion_TableID))");
         $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS RewardQuestPotion_Table(Quest_TableID INTEGER, Potion_TableID INTEGER, RewardAmount INTEGER, UNIQUE(Quest_TableID, Potion_TableID))");
+        $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS FoundDiscoveries_Table(User_TableID INTEGER, Discovery_TableID INTEGER, AvailabilityDate INTEGER, UNIQUE(User_TableID, Discovery_TableID))");
 
-        // Init the tables with values
-        // fill PotionTable
-        var query = 'INSERT INTO Potion_Table (Rank, Name, Description, Price, Class, ImageFilename) VALUES (?, ?, ?, ?, ?, ?)';
-        $cordovaSQLite.execute(db, query, [1, "Yellow Potion", "It's yellow", 100, "YellowPotion", "YellowPotion.png"]);
-        $cordovaSQLite.execute(db, query, [1, "Green Potion", "It's green", 100, "GreenPotion", "GreenPotion.png"]);
+        // Init the tables with values, every Table has a UNIQUE constraint that prevents this init data from being inserted a 2nd time
+        // Performs the insertQuery and sets the returned ID in the provided dataArray[currentElementIndex]
+        var executeQueryHelper = function (insertQuery, parameters, currentElementIndex, dataArray) {
+            var lastElementInserted = false;
+            var q = $q.defer();
+            parameters = parameters || []; // Use empty field in case no parameters are used
+            $cordovaSQLite.execute(db, insertQuery, parameters).then(function (result) {
+                dataArray[currentElementIndex].ID = result.insertId;
+                var lastElementIndex = dataArray.length - 1;
+                if (currentElementIndex == lastElementIndex) {
+                    lastElementInserted = true;
+                };
+                q.resolve(lastElementInserted);
+            });
+            return q.promise;
+        };
+        
+        // Fill Potion_Table function, insertPotions().then(function(){}) is triggered when all elements were inserted into the db
+        var insertPotions = function () {
+            var q = $q.defer();
+            var query = 'INSERT INTO Potion_Table (Rank, Name, Description, Price, Class, ImageFilename) VALUES (?, ?, ?, ?, ?, ?)';
+            for (var i = 0; i < potions.length; i++) {
+                var currentElementIndex = i;
+                executeQueryHelper(query, [potions[i].Rank, potions[i].Name, potions[i].Description, potions[i].Price, potions[i].Class, potions[i].ImageFilename], currentElementIndex, potions).then(function (lastElementInserted) {
+                    if (lastElementInserted) {
+                         q.resolve(potions);
+                    };
+                });
+            };
+            return q.promise;
+        };
+        
+        // Fill Discovery_Table function
+        var insertDiscoveries = function () {
+            var q = $q.defer();
+            var query = "INSERT INTO Discovery_Table (Description, Name) VALUES (?, ?)";
+            for (var i = 0; i < discoveries.length; i++) {
+                var currentElementIndex = i;
+                executeQueryHelper(query, [discoveries[i].Description, discoveries[i].Name], currentElementIndex, discoveries).then(function (lastElementInserted) {
+                    if (lastElementInserted) {
+                        q.resolve(discoveries);
+                    };
+                });
+            };
+            return q.promise;
+        };
+        
+        // Fill Quest_Table function
+        var insertQuests = function () {
+            var q = $q.defer();
+            var query = "INSERT INTO Quest_Table (Name, Description, Rewardmoney, Type) VALUES (?, ?, ?, ?)";
+            for (var i = 0; i < quests.length; i++) {
+                var currentElementIndex = i;
+                executeQueryHelper(query, [quests[i].Name, quests[i].Description, quests[i].Rewardmoney, quests[i].Type], currentElementIndex, quests).then(function (lastElementInserted) {
+                    if (lastElementInserted) {
+                        q.resolve(quests);
+                    };
+                });
+            };
+            return q.promise;
+        };
 
-        $cordovaSQLite.execute(db, query, [2, "Greater Yellow Potion", "It's yellow", 500, "YellowPotion", "GreaterYellowPotion.png"]);
-        $cordovaSQLite.execute(db, query, [2, "Greater Green Potion", "It's green", 500, "GreenPotion", "GreaterGreenPotion.png"]);
+        // Fill User_Table function
+        var insertUsers = function () {
+            var q = $q.defer();
+            var query = "INSERT INTO User_Table (AmountOfGold, CurrentLevel, Name) VALUES (?, ?, ?)";
+            for (var i = 0; i < users.length; i++) {                
+                var currentElementIndex = i;
+                executeQueryHelper(query, [users[i].AmountOfGold, users[i].CurrentLevel, users[i].Name], currentElementIndex, users).then(function (lastElementInserted) {
+                    if (lastElementInserted) {
+                        q.resolve(users);
+                    };
+                });
+            };
+            return q.promise;
+        };
 
-        $cordovaSQLite.execute(db, query, [3, "Perfect Yellow Potion", "It's yellow", 1000, "YellowPotion", "PerfectYellowPotion.png"]);
-        $cordovaSQLite.execute(db, query, [3, "Perfect Green Potion", "It's green", 1000, "GreenPotion", "PerfectGreenPotion.png"]);
+        var getPotionID = function(potionClass, potionRank, potionList){
+            for (var i = 0; i < potionList.length; i++) {
+                if (potionList[i].Class == potionClass && potionList[i].Rank == potionRank) {
+                    return potionList[i].ID;
+                };
+            };
+        };
 
-        // fill UserTable
-        var query = "INSERT INTO User_Table (AmountOfGold, CurrentLevel) VALUES (?, ?)";
-        $cordovaSQLite.execute(db, query, [3000, 1]);
+        var getDiscoveryID = function (discoveryName, discoveryList) {
+            for (var i = 0; i < discoveryList.length; i++) {
+                if (discoveryList[i].Name == discoveryName) {
+                    return discoveryList[i].ID;
+                };
+            };
+        };
 
-        // fill UserpotionTable
-        var query = "INSERT INTO Userpotion_Table (User_TableID, Potion_TableID, Amount) VALUES (?, ?, ?)";     
-        $cordovaSQLite.execute(db, query, [1, 1, 5]);
-        $cordovaSQLite.execute(db, query, [1, 3, 3]);
-        $cordovaSQLite.execute(db, query, [1, 4, 3]);
-        $cordovaSQLite.execute(db, query, [1, 5, 2]);
-        $cordovaSQLite.execute(db, query, [1, 6, 2]);
+        var getQuestID = function (questName, questList) {
+            for (var i = 0; i < questList.length; i++) {
+                if (questList[i].Name == questName) {
+                    return questList[i].ID;
+                };
+            };
+        };
+        
+        // $q.all will wait until the potions, discoveries and quests are inserted; necessary because only then will we know the correct ID's to use (see below)
+        var insertedPotions = insertPotions();
+        var insertedDiscoveries = insertDiscoveries();
+        var insertedQuests = insertQuests();
+        $q.all([insertedPotions, insertedDiscoveries, insertedQuests]).then(function (dataset) {
+            var allPotions = dataset[0];
+            var allDiscoveries = dataset[1];
+            var allQuests = dataset[2];
 
-        // fill DiscoveryTable
-        var query = "INSERT INTO Discovery_Table (FunctionName, Description, Name) VALUES (?, ?, ?)";
-        $cordovaSQLite.execute(db, query, ["DiscoveryOfDay()", "It must be daytime", "Discovery of Day"]);
+            // Fill quest related tables
+            for (var i = 0; i < allQuests.length; i++) {
+                var currentQuestID = allQuests[i].ID;
+                
+                // Fill RewardQuestPotionTable
+                var query = "INSERT INTO RewardQuestPotion_Table (Quest_TableID, Potion_TableID, RewardAmount) VALUES (?, ?, ?)";
+                var rewardPotions = allQuests[i].RewardPotions;
+                for (var x = 0; x < rewardPotions.length; x++) {
+                    var rewardPotionID = getPotionID(rewardPotions[x].Class, rewardPotions[x].Rank, allPotions);
+                    $cordovaSQLite.execute(db, query, [currentQuestID, rewardPotionID, rewardPotions[x].RewardAmount]);
+                };
+                
+                // Fill RequiredQuestPotionTable
+                var query = "INSERT INTO RequiredQuestPotion_Table (Quest_TableID, Potion_TableID, AmountNeeded) VALUES (?, ?, ?)";
+                var requiredPotions = allQuests[i].RequiredPotions;
+                for (var x = 0; x < requiredPotions.length; x++) {
+                    var requiredPotionID = getPotionID(requiredPotions[x].Class, requiredPotions[x].Rank, allPotions);
+                    $cordovaSQLite.execute(db, query, [currentQuestID, requiredPotionID, requiredPotions[x].AmountNeeded]);
+                };
 
-        // fill QuestTable
-        var query = "INSERT INTO Quest_Table (Name, Description, RewardMoney, Type) VALUES (?, ?, ?, ?)";
-        $cordovaSQLite.execute(db, query, ["First small Quest", "Your first small quest", 300, "small"]);
-        $cordovaSQLite.execute(db, query, ["Second small Quest", "For this you need to upgrade", 500, "small"]);
-        $cordovaSQLite.execute(db, query, ["First Big Quest", "Your first big quest", 1000, "big"]);
-        $cordovaSQLite.execute(db, query, ["Mighty Quest", "A mighty quest", 1500, "big"]);
+                // Fill RequiredQuestDiscoveryTable
+                var query = "INSERT INTO RequiredQuestDiscovery_Table (Quest_TableID, Discovery_TableID) VALUES (?, ?)";
+                var requriedQuestDiscoveries = allQuests[i].Discoveries;
+                for (var x = 0; x < requriedQuestDiscoveries.length; x++) {
+                    var requiredDiscoveryID = getDiscoveryID(requriedQuestDiscoveries[x].Name, allDiscoveries);
+                    $cordovaSQLite.execute(db, query, [currentQuestID, requiredDiscoveryID]);
+                };
+            };           
+        });
+        
+        var insertedUsers = insertUsers();
+        $q.all([insertedPotions, insertedUsers, insertedQuests, insertedDiscoveries]).then(function (dataset) {
+            var allPotions = dataset[0];
+            var allUsers = dataset[1];
+            var allQuests = dataset[2];
+            var allDiscoveries = dataset[3];
 
-        // fill SolvedQuestsTable
-        var query = "INSERT INTO SolvedQuests_Table (User_TableID, Quest_TableID) VALUES (?, ?)";
-        $cordovaSQLite.execute(db, query, [1, 3]);
+            // Fill user related tables
+            for (var i = 0; i < allUsers.length; i++) {
+                var currentUserID = allUsers[i].ID;
 
-        // fill RequiredQuestDiscoveryTable
-        var query = "INSERT INTO RequiredQuestDiscovery_Table (Quest_TableID, Discovery_TableID) VALUES (?, ?)";
-        $cordovaSQLite.execute(db, query, [2, 1]);
-        $cordovaSQLite.execute(db, query, [3, 1]);
+                // Fill SolvedQuestsTable
+                var query = "INSERT INTO SolvedQuests_Table (User_TableID, Quest_TableID) VALUES (?, ?)";
+                var solvedQuests = allUsers[i].SolvedQuests;
+                for (var x = 0; x < solvedQuests.length; x++) {
+                    var solvedQuestID = getQuestID(solvedQuests[x].Name, allQuests);
+                    $cordovaSQLite.execute(db, query, [currentUserID, solvedQuestID]);
+                };
 
-        // fill RequiredQuestPotionTable
-        var query = "INSERT INTO RequiredQuestPotion_Table (Quest_TableID, Potion_TableID, AmountNeeded) VALUES (?, ?, ?)";
-        $cordovaSQLite.execute(db, query, [2, 4, 2]);
-        $cordovaSQLite.execute(db, query, [3, 4, 2]);
-        $cordovaSQLite.execute(db, query, [3, 3, 2]);
+                // Fill UserpotionTable
+                var query = "INSERT INTO Userpotion_Table (User_TableID, Potion_TableID, Amount) VALUES (?, ?, ?)";
+                var userpotions = allUsers[i].OwnedPotions;
+                for (var x = 0; x < userpotions.length; x++) {
+                    var userpotionID = getPotionID(userpotions[x].Class, userpotions[x].Rank, allPotions);
+                    $cordovaSQLite.execute(db, query, [currentUserID, userpotionID, userpotions[x].Amount]);
+                };
 
-        // fill RewardQuestPotionTable
-        var query = "INSERT INTO RewardQuestPotion_Table (Quest_TableID, Potion_TableID, RewardAmount) VALUES (?, ?, ?)";
-        $cordovaSQLite.execute(db, query, [2, 4, 4]);
-        $cordovaSQLite.execute(db, query, [3, 4, 2]);
-        $cordovaSQLite.execute(db, query, [3, 6, 1]);
+                // Fill FoundDiscoveries_Table
+                var query = "INSERT INTO FoundDiscoveries_Table (User_TableID, Discovery_TableID, AvailabilityDate) VALUES (?, ?, ?)";
+                var userDiscoveries = allUsers[i].FoundDiscoveries;
+                for (var x = 0; x < userDiscoveries.length; x++) {
+                    var discoveryID = getDiscoveryID(userDiscoveries[x].Name, allDiscoveries);
+                    $cordovaSQLite.execute(db, query, [currentUserID, discoveryID, userDiscoveries[x].AvailabilityDate]);
+                };
+            };
+        });
     });
 });
 

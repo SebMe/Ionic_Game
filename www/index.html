@@ -18,7 +18,12 @@
 
     <!-- your app's js, ORDER OF SCRIPTS MATTER! -->
       <script src="js/Database/ng-cordova.min.js"></script>
-      <script src="cordova.js"></script>    
+      <script src="cordova.js"></script> 
+      <script src="js/Database/InitialTableValues/potions.js"></script>
+      <script src="js/Database/InitialTableValues/quests.js"></script> 
+      <script src="js/Database/InitialTableValues/discoveries.js"></script>
+      <script src="js/Database/InitialTableValues/levels.js"></script>
+      <script src="js/Database/InitialTableValues/users.js"></script>  
       <script src="js/app.js"></script>
       <script src="js/Database/databaseFunctions.js"></script>
       <script src="js/ViewController/homeViewController.js"></script>  <!-- since this file uses the variable myApp, defined in app.js, it has to be included after app.js! -->
@@ -42,6 +47,7 @@
         USEFUL SQLite
         https://blog.nraboy.com/2014/11/use-sqlite-instead-local-storage-ionic-framework/
         https://gist.github.com/borissondagh/29d1ed19d0df6051c56f
+        http://blog.reigndesign.com/blog/using-your-own-sqlite-database-in-android-applications/
                 
         USEFUL AngularJS:    
         https://www.youtube.com/watch?v=tnXO-i7944M

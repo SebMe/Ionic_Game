@@ -143,7 +143,8 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
             AmountOfGold: null,
             CurrentLevel: null,
             OwnedPotions: [],
-            SolvedQuests: []
+            SolvedQuests: [],
+            FoundDiscoveries: []
         };
         var userID = 1;
         var query = 'SELECT * from User_Table where ID = ?';
@@ -151,9 +152,10 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
             if (result.rows.length = 1) {            
                 userValues.ID = result.rows.item(0).ID;
                 userValues.AmountOfGold = result.rows.item(0).AmountOfGold;
-                userValues.CurrentLevel = result.rows.item(0).CurrentLevel;         
+                userValues.CurrentLevel = result.rows.item(0).CurrentLevel;
                 return userValues;
             };
+            return null;
         });
     };
 
@@ -204,6 +206,30 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
         });
     };
     
+    this.getUserFoundDiscoveries = function ($cordovaSQLite) {
+        var foundDiscoveries = [];
+        var userID = 1;
+        var query = 'SELECT * FROM Discovery_Table JOIN FoundDiscoveries_Table on Discovery_Table.ID = FoundDiscoveries_Table.User_TableID where User_TableID = ?';
+        return this.executeQuery(query, [userID]).then(function (result) {
+            if (result.rows.length > 0) {
+                for (var i = 0; i < result.rows.length; i++) {
+                    var foundDiscovery = {
+                        ID: null,
+                        Name: null,
+                        Description: null,
+                        AvailabilityDate: null
+                    };
+                    foundDiscovery.ID = result.rows.item(i).ID;
+                    foundDiscovery.Name = result.rows.item(i).Name;
+                    foundDiscovery.Description = result.rows.item(i).Description;
+                    foundDiscovery.AvailabilityDate = result.rows.item(i).AvailabilityDate;
+                    foundDiscoveries.push(foundDiscovery);
+                };
+                return foundDiscoveries;
+            };
+        });
+    };
+
     // Functions to get the db data
     this.getAllExistingDiscoveries = function ($cordovaSQLite) {
         var allExistingDiscoveries = [];
@@ -271,85 +297,89 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
             accessibleQuests = dataset[0];
             accessibleDiscoveries = dataset[1];
             accessibleRequiredQuestPotions = dataset[2];
-            accessibleRewardQuestPotions = dataset[3];
-
-            
-            
+            accessibleRewardQuestPotions = dataset[3];            
+ 
             // Add discoveries to quests. If Quest1 has Discovery1 and Discovery2 they will be added to it via Quest1.Discoveries.push(Discovery1), Quest1.Discoveries.push(Discovery2)
-            for (var i = 0; i < accessibleQuests.length; i++) {
-                var questDiscoveries = [];
-                for (var x = 0; x < accessibleDiscoveries.length; x++) {
-                    var discoveryWithoutQuestId = {
-                        ID: null,
-                        Name: null,
-                        FunctionName: null,
-                        Description: null
-                    };
-                    if (accessibleDiscoveries[x].questid == accessibleQuests[i].ID) {
-                        discoveryWithoutQuestId.ID = accessibleDiscoveries[x].ID;
-                        discoveryWithoutQuestId.Name = accessibleDiscoveries[x].Name;
-                        discoveryWithoutQuestId.FunctionName = accessibleDiscoveries[x].FunctionName;
-                        discoveryWithoutQuestId.Description = accessibleDiscoveries[x].Description;
-                        accessibleQuests[i].Discoveries.push(discoveryWithoutQuestId);
+            if (typeof accessibleDiscoveries != 'undefined') {
+                for (var i = 0; i < accessibleQuests.length; i++) {
+                    var questDiscoveries = [];
+                    for (var x = 0; x < accessibleDiscoveries.length; x++) {
+                        var discoveryWithoutQuestId = {
+                            ID: null,
+                            Name: null,
+                            FunctionName: null,
+                            Description: null
+                        };
+                        if (accessibleDiscoveries[x].questid == accessibleQuests[i].ID) {
+                            discoveryWithoutQuestId.ID = accessibleDiscoveries[x].ID;
+                            discoveryWithoutQuestId.Name = accessibleDiscoveries[x].Name;
+                            discoveryWithoutQuestId.FunctionName = accessibleDiscoveries[x].FunctionName;
+                            discoveryWithoutQuestId.Description = accessibleDiscoveries[x].Description;
+                            accessibleQuests[i].Discoveries.push(discoveryWithoutQuestId);
+                        };
                     };
                 };
             };
-
+            
             
             // Add the required potions to each quest
-            for (var i = 0; i < accessibleQuests.length; i++) {            
-                for (var x = 0; x < accessibleRequiredQuestPotions.length; x++) {
-                    var requiredPotionWithoutQuestId = {
-                        ID: null,
-                        Rank: null,
-                        Name: null,
-                        Description: null,
-                        Price: null,
-                        Class: null,
-                        ImageFilename: null,
-                        AmountNeeded: null
-                    };
-                    if (accessibleRequiredQuestPotions[x].questid == accessibleQuests[i].ID) {
-                        requiredPotionWithoutQuestId.ID = accessibleRequiredQuestPotions[x].ID;
-                        requiredPotionWithoutQuestId.Rank = accessibleRequiredQuestPotions[x].Rank;
-                        requiredPotionWithoutQuestId.Name = accessibleRequiredQuestPotions[x].Name;
-                        requiredPotionWithoutQuestId.Description = accessibleRequiredQuestPotions[x].Description;
-                        requiredPotionWithoutQuestId.Price = accessibleRequiredQuestPotions[x].Price;
-                        requiredPotionWithoutQuestId.Class = accessibleRequiredQuestPotions[x].Class;
-                        requiredPotionWithoutQuestId.ImageFilename = accessibleRequiredQuestPotions[x].ImageFilename;
-                        requiredPotionWithoutQuestId.AmountNeeded = accessibleRequiredQuestPotions[x].AmountNeeded;
-                        accessibleQuests[i].RequiredPotions.push(requiredPotionWithoutQuestId);
+            if (typeof accessibleRequiredQuestPotions != 'undefined') {
+                for (var i = 0; i < accessibleQuests.length; i++) {
+                    for (var x = 0; x < accessibleRequiredQuestPotions.length; x++) {
+                        var requiredPotionWithoutQuestId = {
+                            ID: null,
+                            Rank: null,
+                            Name: null,
+                            Description: null,
+                            Price: null,
+                            Class: null,
+                            ImageFilename: null,
+                            AmountNeeded: null
+                        };
+                        if (accessibleRequiredQuestPotions[x].questid == accessibleQuests[i].ID) {
+                            requiredPotionWithoutQuestId.ID = accessibleRequiredQuestPotions[x].ID;
+                            requiredPotionWithoutQuestId.Rank = accessibleRequiredQuestPotions[x].Rank;
+                            requiredPotionWithoutQuestId.Name = accessibleRequiredQuestPotions[x].Name;
+                            requiredPotionWithoutQuestId.Description = accessibleRequiredQuestPotions[x].Description;
+                            requiredPotionWithoutQuestId.Price = accessibleRequiredQuestPotions[x].Price;
+                            requiredPotionWithoutQuestId.Class = accessibleRequiredQuestPotions[x].Class;
+                            requiredPotionWithoutQuestId.ImageFilename = accessibleRequiredQuestPotions[x].ImageFilename;
+                            requiredPotionWithoutQuestId.AmountNeeded = accessibleRequiredQuestPotions[x].AmountNeeded;
+                            accessibleQuests[i].RequiredPotions.push(requiredPotionWithoutQuestId);
+                        };
                     };
                 };
             };
             
             // Add the reward potions to each quest
-            for (var i = 0; i < accessibleQuests.length; i++) {              
-                for (var x = 0; x < accessibleRewardQuestPotions.length; x++) {
-                    var rewardPotionWithoutQuestId = {
-                        ID: null,
-                        Rank: null,
-                        Name: null,
-                        Description: null,
-                        Price: null,
-                        Class: null,
-                        ImageFilename: null,
-                        RewardAmount: null
-                    };
-                    if (accessibleRewardQuestPotions[x].questid == accessibleQuests[i].ID) {
-                        rewardPotionWithoutQuestId.ID = accessibleRewardQuestPotions[x].ID;
-                        rewardPotionWithoutQuestId.Rank = accessibleRewardQuestPotions[x].Rank;
-                        rewardPotionWithoutQuestId.Name = accessibleRewardQuestPotions[x].Name;
-                        rewardPotionWithoutQuestId.Description = accessibleRewardQuestPotions[x].Description;
-                        rewardPotionWithoutQuestId.Price = accessibleRewardQuestPotions[x].Price;
-                        rewardPotionWithoutQuestId.Class = accessibleRewardQuestPotions[x].Class;
-                        rewardPotionWithoutQuestId.ImageFilename = accessibleRewardQuestPotions[x].ImageFilename;
-                        rewardPotionWithoutQuestId.RewardAmount = accessibleRewardQuestPotions[x].RewardAmount;
-                        accessibleQuests[i].RewardPotions.push(rewardPotionWithoutQuestId);
+            if (typeof accessibleRewardQuestPotions != 'undefined') {
+                for (var i = 0; i < accessibleQuests.length; i++) {
+                    for (var x = 0; x < accessibleRewardQuestPotions.length; x++) {
+                        var rewardPotionWithoutQuestId = {
+                            ID: null,
+                            Rank: null,
+                            Name: null,
+                            Description: null,
+                            Price: null,
+                            Class: null,
+                            ImageFilename: null,
+                            RewardAmount: null
+                        };
+                        if (accessibleRewardQuestPotions[x].questid == accessibleQuests[i].ID) {
+                            rewardPotionWithoutQuestId.ID = accessibleRewardQuestPotions[x].ID;
+                            rewardPotionWithoutQuestId.Rank = accessibleRewardQuestPotions[x].Rank;
+                            rewardPotionWithoutQuestId.Name = accessibleRewardQuestPotions[x].Name;
+                            rewardPotionWithoutQuestId.Description = accessibleRewardQuestPotions[x].Description;
+                            rewardPotionWithoutQuestId.Price = accessibleRewardQuestPotions[x].Price;
+                            rewardPotionWithoutQuestId.Class = accessibleRewardQuestPotions[x].Class;
+                            rewardPotionWithoutQuestId.ImageFilename = accessibleRewardQuestPotions[x].ImageFilename;
+                            rewardPotionWithoutQuestId.RewardAmount = accessibleRewardQuestPotions[x].RewardAmount;
+                            accessibleQuests[i].RewardPotions.push(rewardPotionWithoutQuestId);
+                        };
                     };
                 };
             };
-    
+
             return accessibleQuests;
         });
     };
@@ -359,14 +389,15 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
         var allQuests = this.getAllExistingQuests($cordovaSQLite);
         var solvedQuestIDs = this.getUserSolvedQuestIDs($cordovaSQLite);
         var ownedPotions = this.getUserOwnedPotion($cordovaSQLite);
+        var foundDiscoveries = this.getUserFoundDiscoveries($cordovaSQLite);
 
-        return $q.all([user, allQuests, solvedQuestIDs, ownedPotions]).then(function (dataset) {
+        return $q.all([user, allQuests, solvedQuestIDs, ownedPotions, foundDiscoveries]).then(function (dataset) {
             var set_user = dataset[0];
             var set_allQuests = dataset[1];
             var set_solvedQuestIDs = dataset[2];
             var set_ownedPotions = dataset[3];
+            var set_foundDiscoveries = dataset[4];
 
-            
             // Filter out the solved quests from the list of all quests
             for (var i = 0; i < set_allQuests.length; i++) {
                 for (var x = 0; x < set_solvedQuestIDs.length; x++) {
@@ -378,6 +409,9 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
 
             // Get the potions the user owns
             set_user.OwnedPotions = set_ownedPotions;
+
+            // Get the discoveries the user owns
+            set_user.FoundDiscoveries = set_foundDiscoveries;
 
             return set_user;
         });

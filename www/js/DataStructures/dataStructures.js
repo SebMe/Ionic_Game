@@ -6,9 +6,17 @@ var userValues = {
             AmountOfGold: null,
             CurrentLevel: null,
             OwnedPotions: [ownedPotion, ownedPotion, ...],
-            SolvedQuests: [solvedQuest, solvedQuest, ...]
+            SolvedQuests: [solvedQuest, solvedQuest, ...],
+            FoundDiscoveries: [foundDiscovery, foundDiscovery, ...]
         };
-        
+                                                        
+                                                        var foundDiscovery = {
+                                                                        ID, null,
+                                                                        Name: null,
+                                                                        Description: null,
+                                                                        AvailabilityDate: null
+                                                                    };
+
                                                         var ownedPotion = {
                                                                         ID: null,
                                                                         Rank: null,
@@ -57,8 +65,8 @@ var userValues = {
                                                                                                                                 var requiredDiscovery = {
                                                                                                                                                     ID: null,
                                                                                                                                                     Name: null,
-                                                                                                                                                    FunctionName: null,
                                                                                                                                                     Description: null,
+                                                                                                                                                    AvailabilityDate: null,
                                                                                                                                                     questid: null
                                                                                                                                                 };
                                                                                                          
