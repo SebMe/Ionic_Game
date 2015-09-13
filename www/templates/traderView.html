@@ -1,11 +1,21 @@
 <ion-view ng-controller="traderViewController" class="homeBackground" style="height: 100%">   
     <img src="img/{{traderImage || 'Trader.png'}}" style="width:100%; margin-bottom: 0;">
-    <h3 style="margin-left: 40%;"> {{userAmountOfGold}} <img src="img/Gold.png" style="height: 1em;" /></h3>
+    <h3 style="margin-left: 40%;"> {{user.AmountOfGold}} <img src="img/Gold.png" style="height: 1em;" /></h3>
     <img src="img/Buy.png" style="height: 10%; width: 35%; margin-top: 2%; margin-left: 5%; border: {{buyBorder}};" ng-click="showPotionsToBuy()" />
     <img src="img/Sell.png" style="height: 10%; width: 35%; margin-top: 2%; margin-left: 20%; border: {{sellBorder}};" ng-click="showAllUserpotions()" />
 
-    <ion-scroll delegate-handle="potionScroller" overflow-scroll="true" zooming="true" direction="y" style="width: 100%; height: 50%">
-        <a ng-repeat="potion in listOfPotions | orderBy:'Class' " class="item item-thumbnail-left" style="margin-left:5%; margin-right:5%; margin-top:5%; border: none; border-bottom:groove;" ng-click="processPotion(potion)">
+    <ion-scroll overflow-scroll="true" zooming="true" direction="y" style="width: 100%; height: 50%; display: {{displayBuyPotionList}};">
+        <a ng-repeat="potion in potionsToBuy | orderBy:'Class' " class="item item-thumbnail-left" style="margin-left:5%; margin-right:5%; margin-top:5%; border: none; border-bottom:groove;" ng-click="buyPotion(potion)">
+            <img src="img/{{potion.ImageFilename}}">
+            <h2>{{potion.Name}}</h2>
+            <p>{{potion.Description}}</p>
+            <p>Rank: {{potion.Rank}}</p>
+            <p>Price: {{potion.Price}}</p>
+        </a>
+    </ion-scroll>
+
+    <ion-scroll overflow-scroll="true" zooming="true" direction="y" style="width: 100%; height: 50%; display: {{displaySellPotionList}};">
+        <a ng-repeat="potion in user.OwnedPotions | orderBy:'Class' " class="item item-thumbnail-left" style="margin-left:5%; margin-right:5%; margin-top:5%; border: none; border-bottom:groove;" ng-click="sellPotion(potion)">
             <img src="img/{{potion.ImageFilename}}">
             <h2>{{potion.Amount + ' ' + potion.Name}}</h2>
             <p>{{potion.Description}}</p>

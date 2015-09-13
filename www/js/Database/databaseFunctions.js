@@ -209,7 +209,7 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
     this.getUserFoundDiscoveries = function ($cordovaSQLite) {
         var foundDiscoveries = [];
         var userID = 1;
-        var query = 'SELECT * FROM Discovery_Table JOIN FoundDiscoveries_Table on Discovery_Table.ID = FoundDiscoveries_Table.User_TableID where User_TableID = ?';
+        var query = 'SELECT * FROM Discovery_Table JOIN FoundDiscoveries_Table on Discovery_Table.ID = FoundDiscoveries_Table.Discovery_TableID where User_TableID = ?';
         return this.executeQuery(query, [userID]).then(function (result) {
             if (result.rows.length > 0) {
                 for (var i = 0; i < result.rows.length; i++) {
@@ -240,16 +240,14 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
                     var discoveryValues = {
                         ID: null,
                         Name: null,
-                        FunctionName: null,
                         Description: null
                     };
                     discoveryValues.ID = result.rows.item(i).ID;
                     discoveryValues.Name = result.rows.item(i).Name;
                     discoveryValues.Description = result.rows.item(i).Description;
-                    discoveryValues.FunctionName = result.rows.item(i).FunctionName;
                     allExistingDiscoveries.push(discoveryValues);
                 };
-                return discoveryValues;
+                return allExistingDiscoveries;
             };
         });
     };
@@ -455,6 +453,21 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
         for (var i = 0; i < questCount; i++) {
             var solvedQuestID = userData.SolvedQuests[i].ID;
             $cordovaSQLite.execute(db, insert_userquests_query, [userID, solvedQuestID]);
+        };
+
+        // Update FoundDiscoveries_Table
+        var insert_discovery_query = "INSERT INTO FoundDiscoveries_Table (User_TableID, Discovery_TableID, AvailabilityDate) VALUES (?, ?, ?)";
+        var update_discovery_query = "UPDATE FoundDiscoveries_Table SET AvailabilityDate = ? where User_TableID = ? AND Discovery_TableID = ?"
+        var userDiscoveries = userData.FoundDiscoveries;
+        var userID = userData.ID;
+        var discoveryCount = 0;
+        if (typeof userDiscoveries != 'undefined') {
+            discoveryCount += userData.FoundDiscoveries.length;
+        };
+        for (var x = 0; x < discoveryCount; x++) {
+            var discoveryID = userDiscoveries[x].ID;
+            $cordovaSQLite.execute(db, insert_discovery_query, [userID, discoveryID, userDiscoveries[x].AvailabilityDate]);
+            $cordovaSQLite.execute(db, update_discovery_query, [userDiscoveries[x].AvailabilityDate, userID, discoveryID]);
         };
     };
 

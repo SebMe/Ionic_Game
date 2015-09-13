@@ -5,8 +5,10 @@ var quests = [
         Description: "Your first small quest",
         Rewardmoney: 300,
         Type: "small",
-        RewardPotions: [],
-        RequiredPotions:[],
+        RewardPotions: [
+            { Class: "GreenPotion", Rank: 3, RewardAmount: 2 }],
+        RequiredPotions: [
+            { Class: "GreenPotion", Rank: 2, AmountNeeded: 2 }],
         Discoveries: []
     },
     {
@@ -22,7 +24,7 @@ var quests = [
             { Class: "GreenPotion", Rank: 2, AmountNeeded: 2 }
         ],
         Discoveries: [
-            { Name: "Discovery of Day" }
+            { Name: "Discovery of Touch" }
         ]
     },
     {

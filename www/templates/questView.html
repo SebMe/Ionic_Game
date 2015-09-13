@@ -1,12 +1,15 @@
 <!-- The quest view, displays all quests as list-->
 <ion-view ng-controller="questViewController">
-    <a ng-repeat="quest in allQuests" class="item item-thumbnail-left" href="#">
+    <ion-scroll overflow-scroll="true" zooming="true" direction="y" style="width: 100%; height: 100%;">
+    <a ng-repeat=" quest in allQuests" class="item item-thumbnail-left" ng-click="questClicked(quest)" style="background-color:{{quest.backgroundColor}};">
+        <img src="{{quest.ImageFilename}}" ng-show="quest.ImageFilename"/>
         <h2>{{quest.Name}}</h2>
         <p>{{quest.Description}}</p>
         <p>Type: {{quest.Type}}</p>
         <p>Reward Money: {{quest.Rewardmoney}}</p>
-        <p ng-repeat="rewardPotion in quest.RewardPotions"> Reward Potion: {{rewardPotion.RewardAmount}} x {{rewardPotion.Name}}</p> 
-        <p ng-repeat="requiredPotion in quest.RequiredPotions"> Required Potion: {{requiredPotion.AmountNeeded}} x {{requiredPotion.Name}}</p> 
-        <p ng-repeat="requiredDiscovery in quest.Discoveries"> Required Discovery: {{requiredDiscovery.Name}}</p>           
-    </a>
+        <p ng-repeat="rewardPotion in quest.RewardPotions"> Reward Potion: {{rewardPotion.RewardAmount}} x {{rewardPotion.Name}}</p>
+        <p ng-repeat="requiredPotion in quest.RequiredPotions"> Required Potion: {{requiredPotion.AmountNeeded}} x {{requiredPotion.Name}}</p>
+        <p ng-repeat="requiredDiscovery in quest.Discoveries"> Required Discovery: {{requiredDiscovery.Name}}</p>
+        </a>
+        <ion-scroll/>
 </ion-view>

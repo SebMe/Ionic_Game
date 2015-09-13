@@ -297,11 +297,11 @@ myApp.config(function ($stateProvider, $urlRouterProvider) {
         }
     });
 
-    $stateProvider.state('state_TestViewDisplayed', {
-        url: '/test',
+    $stateProvider.state('state_UserViewDisplayed', {
+        url: '/user',
         views: {
-            name_testView: {
-                templateUrl: 'templates/testView.html'
+            name_userView: {
+                templateUrl: 'templates/userView.html'
             }
         }
     });

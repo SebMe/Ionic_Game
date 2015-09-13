@@ -25,7 +25,7 @@ var potions = [
         Rank: 3,
         Name: "Perfect Yellow Potion",
         Description: "It's yellow",
-        Price: 1000,
+        Price: 1500,
         Class: "YellowPotion",
         ImageFilename: "PerfectYellowPotion.png"
     },
@@ -55,7 +55,7 @@ var potions = [
         Rank: 3,
         Name: "Perfect Green Potion",
         Description: "It's green",
-        Price: 1000,
+        Price: 1500,
         Class: "GreenPotion",
         ImageFilename: "PerfectGreenPotion.png"
     }

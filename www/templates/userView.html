@@ -1,0 +1,54 @@
+<!-- The home view, only displays the ionic logo-->
+<ion-view ng-controller="userViewController" class="homeBackground">
+    <table style="width:100%; margin-top:5%;">
+        <tr style ="border:{{goldBorder}}">
+            <td><h4 style="margin-left: 10%; margin-top: 5%;"> Gold:</h4></td>
+            <td><h4>{{user.AmountOfGold}} <img src="img/Gold.png" style="height: 1em;" /></h4></td>
+        </tr>
+        <tr style ="border:{{potionBorder}}" ng-click="showOwnedPotionsFunction()">
+            <td><h4 style="margin-left: 10%; margin-top: 5%;"> Potion Value:</h4></td>
+            <td><h4>{{potionValue}}</h4></td>
+        </tr>
+        <tr style ="border:{{questBorder}}" ng-click="showSolvedQuestsFunction()">
+            <td><h4 style="margin-left: 10%; margin-top: 5%;"> Solved Quests:</h4></td>
+            <td><h4>{{user.SolvedQuests.length}} / {{allQuests.length}}</h4></td>
+        </tr>
+        <tr style ="border:{{discoveryBorder}}" ng-click="showFoundDiscoveriesFunction()">
+            <td><h4 style="margin-left: 10%; margin-top: 5%;"> Found Discoveries:</h4></td>
+            <td><h4>{{user.FoundDiscoveries.length}} / {{allDiscoveries.length}}</h4></td>
+        </tr>
+</table>
+
+
+    <ion-scroll overflow-scroll="true" zooming="true" direction="y" style="width: 100%; height: 50%; margin-top: 5%; display: {{showPotions}};">
+        <a ng-repeat="potion in user.OwnedPotions | orderBy:'Class' " class="item item-thumbnail-left" style="margin-left:5%; margin-right:5%; margin-top:5%; border: none; border-bottom:groove;">
+            <img src="img/{{potion.ImageFilename}}">
+            <h2>{{potion.Amount + ' ' + potion.Name}}</h2>
+            <p>{{potion.Description}}</p>
+            <p>Rank: {{potion.Rank}}</p>
+            <p>Price: {{potion.Price}}</p>
+        </a>
+    </ion-scroll>
+
+    <ion-scroll overflow-scroll="true" zooming="true" direction="y" style="width: 100%; height: 50%; margin-top: 5%; display: {{showSolvedQuests}};">
+        <a ng-repeat="quest in user.SolvedQuests" class="item item-thumbnail-left" style="margin-left:5%; margin-right:5%; margin-top:5%; border: none; border-bottom:groove;">
+            <h2>{{quest.Name}}</h2>
+            <p>{{quest.Description}}</p>
+            <p>Type: {{quest.Type}}</p>
+            <p>Reward Money: {{quest.Rewardmoney}}</p>
+            <p ng-repeat="rewardPotion in quest.RewardPotions"> Reward Potion: {{rewardPotion.RewardAmount}} x {{rewardPotion.Name}}</p>
+            <p ng-repeat="requiredPotion in quest.RequiredPotions"> Required Potion: {{requiredPotion.AmountNeeded}} x {{requiredPotion.Name}}</p>
+            <p ng-repeat="requiredDiscovery in quest.Discoveries"> Required Discovery: {{requiredDiscovery.Name}}</p>
+        </a>
+    </ion-scroll>
+
+    <ion-scroll overflow-scroll="true" zooming="true" direction="y" style="width: 100%; height: 50%; margin-top: 5%; display: {{showDiscoveries}};">
+        <a ng-repeat="discovery in user.FoundDiscoveries" class="item item-thumbnail-left" style="margin-left:5%; margin-right:5%; margin-top:5%; border: none; border-bottom:groove;">
+            <h2>{{discovery.Name}}</h2>
+            <p>{{discovery.Description}}</p>
+            <p>{{discovery.AvailabilityText}}</p>
+        </a>
+    </ion-scroll>
+
+
+</ion-view>

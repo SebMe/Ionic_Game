@@ -1,7 +1,7 @@
 myApp.controller('traderViewController', function ($scope, $cordovaSQLite, $cordovaNativeAudio, $timeout, databaseFunctions) {
     $scope.$on('$ionicView.enter', function () {
         databaseFunctions.getUser($cordovaSQLite).then(function (user) {            
-            $scope.userAmountOfGold = user.AmountOfGold;
+            $scope.user = user;
         });
 
         // Preload sounds that can be used in the view
@@ -10,7 +10,9 @@ myApp.controller('traderViewController', function ($scope, $cordovaSQLite, $cord
 
     $scope.showPotionsToBuy = function () {
         databaseFunctions.getAllExistingPotions($cordovaSQLite).then(function (allPotions) {
-            $scope.listOfPotions = allPotions;
+            $scope.potionsToBuy = allPotions;
+            $scope.displayBuyPotionList = 'block';
+            $scope.displaySellPotionList = 'none';
             $scope.action = 'buy';
             $scope.buyBorder = 'dashed';
             $scope.sellBorder = 'none';
@@ -20,20 +22,14 @@ myApp.controller('traderViewController', function ($scope, $cordovaSQLite, $cord
     $scope.showAllUserpotions = function () {
         databaseFunctions.getUser($cordovaSQLite).then(function (user) {
             $scope.listOfPotions = user.OwnedPotions;
+            $scope.displayBuyPotionList = 'none';
+            $scope.displaySellPotionList = 'block';
             $scope.action = 'sell';
             $scope.sellBorder = 'dashed';
             $scope.buyBorder = 'none';
         });
     };
     
-    $scope.processPotion = function (potion) {
-        if ($scope.action == 'buy') {
-            $scope.buyPotion(potion);
-        } else {
-            $scope.sellPotion(potion);
-        };
-    }
-
     $scope.buyPotion = function (potion) {
         databaseFunctions.getUser($cordovaSQLite).then(function (user) {
             // Potion retrieved from the Potions_Table has no Amount field, need to add Amount since a potion the user possesses has an Amount
@@ -66,7 +62,7 @@ myApp.controller('traderViewController', function ($scope, $cordovaSQLite, $cord
                     $scope.traderImage = 'Trader.png';
                 }, 500);
             };
-            $scope.userAmountOfGold = user.AmountOfGold;
+            $scope.user = user;
             databaseFunctions.updateAllUserData($cordovaSQLite, user);
         });      
     };
@@ -86,8 +82,7 @@ myApp.controller('traderViewController', function ($scope, $cordovaSQLite, $cord
                         }, 500);                       
                     };
                 };
-                $scope.userAmountOfGold = user.AmountOfGold;
-                $scope.listOfPotions = user.OwnedPotions;
+                $scope.user = user;
                 databaseFunctions.updateAllUserData($cordovaSQLite, user);
             };
         });

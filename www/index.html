@@ -31,7 +31,7 @@
       <script src="js/ViewController/questViewController.js"></script>
       <script src="js/ViewController/professorViewController.js"></script>
       <script src="js/ViewController/traderViewController.js"></script>
-      <script src="js/ViewController/testViewController.js"></script>
+      <script src="js/ViewController/userViewController.js"></script>
       <script src="js/ViewController/upgradePotionViewController.js"></script> 
       <script src="js/ViewController/openQuestsViewController.js"></script>    
     </head>
@@ -75,15 +75,15 @@
             <ion-tab icon="ion-home" ui-sref="state_HomeViewDisplayed">
                  <ion-nav-view name="name_home"></ion-nav-view>
             </ion-tab>   
+          <ion-tab icon="ion-android-contact" ui-sref="state_UserViewDisplayed">
+              <ion-nav-view name="name_userView"></ion-nav-view>
+          </ion-tab> 
             <ion-tab icon="ion-home" ui-sref="state_ProfessorViewDisplayed" hidden="true">
                  <ion-nav-view name="name_professorView"></ion-nav-view>
             </ion-tab> 
             <ion-tab icon="ion-home" ui-sref="state_TraderViewDisplayed" hidden="true">
                   <ion-nav-view name="name_traderView"></ion-nav-view>
-            </ion-tab>         
-            <ion-tab icon="ion-erlenmeyer-flask" ui-sref="state_TestViewDisplayed" hidden="true">
-                   <ion-nav-view name="name_testView"></ion-nav-view>
-            </ion-tab>                
+            </ion-tab>                     
             <ion-tab icon="ion-eye" ui-sref="state_PotionDiscoveryViewDisplayed" hidden="true">
                   <ion-nav-view name="name_potionDiscoveryView"></ion-nav-view>
             </ion-tab>

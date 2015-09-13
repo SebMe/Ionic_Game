@@ -13,7 +13,8 @@ var users = [
             { Rank: 3, Class: "GreenPotion", Amount: 3 }
         ],
         SolvedQuests: [
-            { Name: "First small Quest" }
+            { Name: "First small Quest" },
+            { Name: "Mighty Quest" }
         ],
         FoundDiscoveries: [
             { Name: "Discovery of Day", AvailabilityDate: 1441997210908 }
