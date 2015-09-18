@@ -1,11 +1,12 @@
 ﻿<ion-view ng-controller="potionDiscoveryViewController">   
    
+    <h1 align="center">{{discoveryName}}</h1>
     <h1 align="center">{{cooldown}}</h1>
 
      <div style="width: 100%; min-height: 100%; height: 100%;" ng-click="touchDiscovery()">        
         <!-- ng-show is workaround, ng-src with an empty path wont remove the image, when ng-show = false it is not shown-->
         <img ng-src="img/{{displayPotion.ImageFilename}}" ng-show="displayPotion.ImageFilename" style="margin-top:100px; margin-left:auto; margin-right:auto; display: block" />
-        <h1 align="center">{{displayPotion.Name}}</h1>
-        <p align="center">{{displayPotion.Description}}</p>
+        <br/>
+		<h1 align="center">{{bonusGold}} <img src="img/{{goldImageFilename}}" ng-show="goldImageFilename" style="height: 1em;" /></h1>
     </div>   
 </ion-view>

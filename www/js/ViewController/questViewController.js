@@ -1,4 +1,4 @@
-myApp.controller('questViewController', function ($scope, $cordovaSQLite, $ionicPopup, databaseFunctions) {
+myApp.controller('questViewController', function ($scope, $cordovaSQLite, $ionicPopup, $timeout, databaseFunctions) {
 
     var setQuestImageToSolved = function(name, allQuests){
         for (var i = 0; i < allQuests.length; i++) {
@@ -97,38 +97,77 @@ myApp.controller('questViewController', function ($scope, $cordovaSQLite, $ionic
         };
     };
 
-    var addQuestRewardPotionsToUser = function (rewardPotions, user) {
-        for (var i = 0; i < rewardPotions.length; i++) {
+    var rewardUser = function (quest, user, allExistingPotions) {
+		var rewardPotions = quest.RewardPotions;      
+		var bonusPotions = [];
+		for(var i = 0; i < user.ExtraPotionOnQuest; i++){				
+			var bonusPotionIndex = Math.round(Math.random()*100) % allExistingPotions.length; // Will be between 0 and length-1
+			allExistingPotions[bonusPotionIndex].RewardAmount = 1;
+			bonusPotions.push(allExistingPotions[bonusPotionIndex]);			
+		};	
+		
+		addPotionsToUser(user, rewardPotions);					
+		addPotionsToUser(user, bonusPotions);		
+		user.AmountOfGold += quest.Rewardmoney;
+		
+		showRewardPotionPopup(quest.RewardPotions, "Reward potions");
+		if(bonusPotions.length > 0){
+			$timeout(function () {showRewardPotionPopup(bonusPotions, "Bonus potions");}, 1200);
+		};	
+    };
+
+	var addPotionsToUser = function(user, potions){
+		for (var i = 0; i < potions.length; i++) {
             var potionAmountIncreased = false;
-            for (var x = 0; x < user.OwnedPotions.length; x++) {
-                if (user.OwnedPotions[x].ID == rewardPotions[i].ID) {
-                    user.OwnedPotions[x].Amount += rewardPotions[i].RewardAmount;
+			for (var x = 0; x < user.OwnedPotions.length; x++) {
+                if (user.OwnedPotions[x].ID == potions[i].ID) {
+                    user.OwnedPotions[x].Amount += potions[i].RewardAmount;
                     potionAmountIncreased = true;
                 };
             };
 
             // User didnt have any amount of this potion type, so we have to add it
             if (potionAmountIncreased == false) {
-                rewardPotions[i].Amount = rewardPotions[i].RewardAmount;
-                user.OwnedPotions.push(rewardPotions[i]);
-            }
+                rewardPotions[i].Amount = potions[i].RewardAmount;
+                user.OwnedPotions.push(potions[i]);
+            };			
         };
-    };
-
-    var sayHi = function () {
-        alert('hi');
-    }
-
+	};
+	
+	var showRewardPotionPopup = function(potionsToShow, popuptitle){
+		$scope.potionsList = potionsToShow;
+		var popupTitle = 'Reward potions received';
+		var rewardPotionPopup = $ionicPopup.show({
+                template:
+				 '<ion-list>' +
+                        '  <ion-item ng-repeat="potion in potionsList"> ' +
+                        '    <img src="img/{{potion.ImageFilename}}">' +
+                        '     <h2>{{potion.RewardAmount}} {{potion.Name}}</h2>' +
+                        '     <p>{{potion.Description}}</p>' +
+                        '     <p>Rank: {{potion.Rank}}</p>' +
+                        '     <p>Price: {{potion.Price}}</p> ' + 
+                        '  </ion-item>' +
+				  '</ion-list>',
+                title: popuptitle,
+                scope: $scope
+            });
+		$timeout(function () {
+			rewardPotionPopup.close();
+			}, 800);
+	};
+	
+	
     var solveQuestFunction = function (quest) {
 
         databaseFunctions.getUser($cordovaSQLite).then(function (user) {
-            user.SolvedQuests.push(quest);
-            removeRequiredQuestPotionsFromUser(quest.RequiredPotions, user);
-            addQuestRewardPotionsToUser(quest.RewardPotions, user);
-            user.AmountOfGold += quest.Rewardmoney;
-            databaseFunctions.updateAllUserData($cordovaSQLite, user);           
-            setQuestImageToSolved(quest.Name, $scope.allQuests);
-            setQuestColorGreenIfSolvable($scope.allQuests, user);
-        });
+			databaseFunctions.getAllExistingPotions($cordovaSQLite).then(function(allExistingPotions){	           
+				user.SolvedQuests.push(quest);
+				removeRequiredQuestPotionsFromUser(quest.RequiredPotions, user);
+				rewardUser(quest, user, allExistingPotions);
+				databaseFunctions.updateAllUserData($cordovaSQLite, user);           
+				setQuestImageToSolved(quest.Name, $scope.allQuests);
+				setQuestColorGreenIfSolvable($scope.allQuests, user);
+			});
+		});
     };
 })

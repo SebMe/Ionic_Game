@@ -26,6 +26,7 @@
       <script src="js/Database/InitialTableValues/users.js"></script>  
       <script src="js/app.js"></script>
       <script src="js/Database/databaseFunctions.js"></script>
+	  <script src="js/Services/itemService.js"></script>
       <script src="js/ViewController/homeViewController.js"></script>  <!-- since this file uses the variable myApp, defined in app.js, it has to be included after app.js! -->
       <script src="js/ViewController/potionDiscoveryViewController.js"></script>   
       <script src="js/ViewController/questViewController.js"></script>
@@ -33,7 +34,9 @@
       <script src="js/ViewController/traderViewController.js"></script>
       <script src="js/ViewController/userViewController.js"></script>
       <script src="js/ViewController/upgradePotionViewController.js"></script> 
-      <script src="js/ViewController/openQuestsViewController.js"></script>    
+      <script src="js/ViewController/userCharacterViewController.js"></script>   
+	  <script src="js/ViewController/potionCollectMinigameViewController.js"></script>  
+	  
     </head>
 
     <!-- 
@@ -43,6 +46,7 @@
         http://learn.ionicframework.com/formulas/navigation-and-routing-part-1/
         http://ionicframework.com/docs/api/directive/ionView/
         https://blog.nraboy.com/2014/12/understanding-tabs-ionic-framework/
+        http://www.codeandyou.com/2015/08/How-to-customize-color-and-theme-of-ionic-popup.html
        
         USEFUL SQLite
         https://blog.nraboy.com/2014/11/use-sqlite-instead-local-storage-ionic-framework/
@@ -72,7 +76,7 @@
        <!-- The tabs bar at the bottom of the screen, each tab icon can be clicked and loads a view -->
        <!-- Tabs with hidden are included, so buttons can open the views with ui-sref -->
       <ion-tabs class="tabs-dark">
-            <ion-tab icon="ion-home" ui-sref="state_HomeViewDisplayed">
+            <ion-tab icon="ion-ios-home" ui-sref="state_HomeViewDisplayed">
                  <ion-nav-view name="name_home"></ion-nav-view>
             </ion-tab>   
           <ion-tab icon="ion-android-contact" ui-sref="state_UserViewDisplayed">
@@ -93,8 +97,11 @@
           <ion-tab icon="ion-erlenmeyer-flask" ui-sref="state_UpgradePotionViewDisplayed" hidden="true">
               <ion-nav-view name="name_upgradePotionView"></ion-nav-view>
           </ion-tab>
-          <ion-tab icon="ion-erlenmeyer-flask" ui-sref="state_OpenQuestsViewDisplayed" hidden="true">
-              <ion-nav-view name="name_openQuestsView"></ion-nav-view>
+          <ion-tab icon="ion-social-codepen-outline" ui-sref="state_UserCharacterViewDisplayed">
+              <ion-nav-view name="name_userCharacterView"></ion-nav-view>
+          </ion-tab>
+		  <ion-tab icon="ion-social-codepen-outline" ui-sref="state_PotionCollectMinigameViewDisplayed" hidden="true">
+              <ion-nav-view name="name_potionCollectMinigameView"></ion-nav-view>
           </ion-tab>
       </ion-tabs>
 </body>

@@ -38,8 +38,8 @@ button{
     background-size: cover;
 }
 
-.homeCastle {
-    background: url('../img/HomeCastle.png') no-repeat;
+.itemSlot {
+    background: url('../img/EmptyItemSlot.png') no-repeat;
     position: absolute; 
     height: 100%; 
     width: 100%;

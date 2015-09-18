@@ -40,10 +40,12 @@ var myApp = angular.module('starter', ['ionic', 'ngCordova'])
         $cordovaSQLite.execute(db, 'DROP TABLE RequiredQuestPotion_Table');
         $cordovaSQLite.execute(db, 'DROP TABLE RewardQuestPotion_Table');
         $cordovaSQLite.execute(db, 'DROP TABLE FoundDiscoveries_Table');
+        $cordovaSQLite.execute(db, 'DROP TABLE UserDiscoveryData_Table');
+        $cordovaSQLite.execute(db, 'DROP TABLE UserItem_Table');
         
         // Create all tables
         $cordovaSQLite.execute(db, 'CREATE TABLE IF NOT EXISTS Potion_Table(ID INTEGER PRIMARY KEY AUTOINCREMENT, Rank INTEGER, Name TEXT, Description TEXT, Price INTEGER, Class TEXT, ImageFilename TEXT, UNIQUE(Rank, Class))');
-        $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS User_Table(ID INTEGER PRIMARY KEY AUTOINCREMENT, AmountOfGold INTEGER, CurrentLevel INTEGER, Name TEXT, UNIQUE(Name))");
+        $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS User_Table(ID INTEGER PRIMARY KEY AUTOINCREMENT, AmountOfGold INTEGER, CurrentLevel INTEGER, Name TEXT, ChanceExtraPotionOnUpgrade INTEGER, ExtraPotionOnQuest INTEGER, ExtraGoldOnDiscovery INTEGER, DiscoveryCDReductionPercentage INTEGER, TraderDiscountPercentage INTEGER, UNIQUE(Name))");
         $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS Userpotion_Table(User_TableID INTEGER, Potion_TableID INTEGER, Amount INTEGER, UNIQUE(User_TableID, Potion_TableID))");
         $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS Discovery_Table(ID INTEGER PRIMARY KEY AUTOINCREMENT, Description TEXT, Name TEXT, UNIQUE(Name))");
         $cordovaSQLite.execute(db, 'CREATE TABLE IF NOT EXISTS Quest_Table(ID INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT, Description TEXT, Rewardmoney INTEGER, Type TEXT, UNIQUE(Name))');
@@ -52,8 +54,10 @@ var myApp = angular.module('starter', ['ionic', 'ngCordova'])
         $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS RequiredQuestPotion_Table(Quest_TableID INTEGER, Potion_TableID INTEGER, AmountNeeded INTEGER, UNIQUE(Quest_TableID, Potion_TableID))");
         $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS RewardQuestPotion_Table(Quest_TableID INTEGER, Potion_TableID INTEGER, RewardAmount INTEGER, UNIQUE(Quest_TableID, Potion_TableID))");
         $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS FoundDiscoveries_Table(User_TableID INTEGER, Discovery_TableID INTEGER, AvailabilityDate INTEGER, UNIQUE(User_TableID, Discovery_TableID))");
+        $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS UserDiscoveryData_Table(User_TableID INTEGER, Discovery_TableID INTEGER, DiscoveryData TEXT, UNIQUE(User_TableID, Discovery_TableID))");
+        $cordovaSQLite.execute(db, "CREATE TABLE IF NOT EXISTS UserItem_Table(ID INTEGER PRIMARY KEY AUTOINCREMENT, User_TableID INTEGER, Class TEXT, Price INTEGER, ChanceExtraPotionOnUpgrade INTEGER, ExtraPotionOnQuest INTEGER, ExtraGoldOnDiscovery INTEGER, DiscoveryCDReductionPercentage INTEGER, TraderDiscountPercentage INTEGER, ImageFilename TEXT, Equipped TEXT)");
 
-        // Init the tables with values, every Table has a UNIQUE constraint that prevents this init data from being inserted a 2nd time
+        // Init the tables with values
         // Performs the insertQuery and sets the returned ID in the provided dataArray[currentElementIndex]
         var executeQueryHelper = function (insertQuery, parameters, currentElementIndex, dataArray) {
             var lastElementInserted = false;
@@ -315,11 +319,20 @@ myApp.config(function ($stateProvider, $urlRouterProvider) {
         }
     });
 
-    $stateProvider.state('state_OpenQuestsViewDisplayed', {
-        url: '/openQuests',
+    $stateProvider.state('state_UserCharacterViewDisplayed', {
+        url: '/character',
         views: {
-            name_openQuestsView: {
-                templateUrl: 'templates/openQuestsView.html'
+            name_userCharacterView: {
+                templateUrl: 'templates/userCharacterView.html'
+            }
+        }
+    });
+	
+	$stateProvider.state('state_PotionCollectMinigameViewDisplayed', {
+        url: '/minigame/potionCollect',
+        views: {
+            name_potionCollectMinigameView: {
+                templateUrl: 'templates/potionCollectMinigameView.html'
             }
         }
     });

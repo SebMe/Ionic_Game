@@ -62,20 +62,24 @@ myApp.controller('upgradePotionViewController', function ($scope, $cordovaSQLite
     $scope.upgradePotion = function () {
         databaseFunctions.getUser($cordovaSQLite).then(function (user) {
             var higherPotionAdded = false;
-            for (var i = 0; i < user.OwnedPotions.length; i++) {
+            var bonusPotion = user.ChanceExtraPotionOnUpgrade >= (Math.random()*100);
+			$scope.resultAmount = 1;
+			if(bonusPotion){$scope.resultAmount++;};
+			
+			for (var i = 0; i < user.OwnedPotions.length; i++) {
                 if (user.OwnedPotions[i].ID == $scope.selectedPotion.ID) {
                     user.OwnedPotions[i].Amount -= 2;
                 };
 
                 if (user.OwnedPotions[i].ID == $scope.upgradedPotionToAdd.ID) {
-                    user.OwnedPotions[i].Amount++;
+                    user.OwnedPotions[i].Amount += $scope.resultAmount;
                     higherPotionAdded = true;
                 };
             };
 
             // If the user didnt have any amount of this potion, so we couldnt just increase the amount, we add it now with amount 1
             if (higherPotionAdded == false) {
-                $scope.upgradedPotionToAdd.Amount = 1;
+                $scope.upgradedPotionToAdd.Amount = $scope.resultAmount;
                 user.OwnedPotions.push($scope.upgradedPotionToAdd);                
             };
 
@@ -87,9 +91,11 @@ myApp.controller('upgradePotionViewController', function ($scope, $cordovaSQLite
 
            
             var resultPopup = $ionicPopup.show({
-                template: '<img src="img/{{upgradedPotionToAdd.ImageFilename}}">',
+                template:
+                        '<style>.popup {min-width:30%;}</style>'+
+                        '<img src="img/{{upgradedPotionToAdd.ImageFilename}}" style="margin-left:15%;">',
 
-                title: '<h1> +1 </h1>',
+                title: '<h1> +'+$scope.resultAmount+' </h1>',
                 scope: $scope
             });
             $timeout(function () {resultPopup.close();}, 600);

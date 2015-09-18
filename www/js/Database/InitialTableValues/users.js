@@ -2,7 +2,7 @@
 var users = [
     {
         ID: null,
-        AmountOfGold: 2000,
+        AmountOfGold: 30000,
         CurrentLevel: 1,
         OwnedPotions: [
             { Rank: 1, Class: "YellowPotion", Amount: 3 },
@@ -17,7 +17,6 @@ var users = [
             { Name: "Mighty Quest" }
         ],
         FoundDiscoveries: [
-            { Name: "Discovery of Day", AvailabilityDate: 1441997210908 }
         ]
     }
 ];
