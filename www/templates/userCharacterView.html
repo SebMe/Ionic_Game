@@ -1,0 +1,52 @@
+<ion-view ng-controller="userCharacterViewController" class="homeBackground">
+
+    
+
+    <div style="position:relative;">
+        <img src="img/{{headItemImageFilename || 'HatDefault.png'}}" style="width:20%; margin-left:39%; margin-top:6%; position:absolute;" ng-click="showSelection('head')" />
+        <img src="img/{{neckItemImageFilename || 'AmulettDefault.png'}}" style="width:20%; margin-left:72%; margin-top:6%; position:absolute;" ng-click="showSelection('neck')" />
+        <img src="img/EmptyItemSlot.png" style="width:30%; visibility:hidden;" />
+        <img src="img/EmptyItemSlot.png" style="width:30%; margin-left:3%;"/>
+        <img src="img/EmptyItemSlot.png" style="width:30%; margin-left:3%;"/>      
+    </div>
+
+    <div style="margin-top:6%; position:relative;">
+        <img src="img/{{mainHandItemImageFilename || 'WandDefault.png'}}" style="width:20%; margin-left:5%; margin-top:6%; position:absolute;" ng-click="showSelection('mainHand')" />
+        <img src="img/{{bodyItemImageFilename || 'CoatDefault.png'}}" style="width:20%; margin-left:39%; margin-top:6%; position:absolute;" ng-click="showSelection('body')" />
+        <img src="img/{{offHandItemImageFilename || 'RingDefault.png'}}" style="width:20%; margin-left:72%; margin-top:6%; position:absolute;" ng-click="showSelection('offHand')" />
+        <img src="img/EmptyItemSlot.png" style="width:30%;"/>
+        <img src="img/EmptyItemSlot.png" style="width:30%; margin-left:3%"/>
+        <img src="img/EmptyItemSlot.png" style="width:30%; margin-left:3%;" ng-click="showSelection('offHand')" />
+    </div>
+
+    <div style="margin-top:6%; position:relative;">
+        <img src="img/{{feetItemImageFilename || 'BootsDefault.png'}}" style="width:20%; margin-left:39%; margin-top:6%; position:absolute;" ng-click="showSelection('feet')" />
+        <img src="img/EmptyItemSlot.png" style="width:30%;  visibility:hidden;" />
+        <img src="img/EmptyItemSlot.png" style="width:30%; margin-left:3%;"/>
+        <img src="img/EmptyItemSlot.png" style="width:30%; margin-left:3%;  visibility:hidden;" />
+    </div>
+
+    <table style="width:100%; border-top: dashed;">
+        <tr>
+            <td><h5 style="margin-left: 10%;"> Extra potion on upgrade: </h5></td>
+            <td><h5>{{user.ChanceExtraPotionOnUpgrade || 0}}%</h5></td>
+        </tr>
+        <tr>
+            <td><h5 style="margin-left: 10%; margin-top: 5%;"> Extra potion on quest: </h5></td>
+            <td><h5>{{user.ExtraPotionOnQuest || 0}}</h5></td>
+        </tr>
+        <tr>
+            <td><h5 style="margin-left: 10%; margin-top: 5%;"> Extra gold on discovery: </h5></td>
+            <td><h5>{{user.ExtraGoldOnDiscovery || 0}} <img src="img/Gold.png" style="height: 1em;" /></h5></td>
+        </tr>
+        <tr>
+            <td><h5 style="margin-left: 10%; margin-top: 5%;"> Discovery cooldown reduction: </h5></td>
+            <td><h5> {{user.DiscoveryCDReductionPercentage || 0}}%</h5></td>
+        </tr>
+        <tr>
+            <td><h5 style="margin-left: 10%; margin-top: 5%;"> Trader discount percentage: </h5></td>
+            <td><h5>{{user.TraderDiscountPercentage || 0}}%</h5></td>
+        </tr>
+    </table>
+
+</ion-view>

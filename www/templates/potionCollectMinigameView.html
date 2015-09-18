@@ -1,0 +1,8 @@
+<ion-view ng-controller="potionCollectMinigameViewController" class="homeBackground">
+<h1 style="border-bottom:dashed; background-color:{{rewardBackgroundColor}};" ng-click="takeReward(score)">Reward: {{score}} <img src="img/Gold.png" style="height: 1em;"</h1>
+<h1 align="center" style="margin-top:30%; display:{{hideStartTextIfSetToNone}}" ng-click="startGame()">Start</h1>
+<h2 align="center" style="margin-top:10%; display:{{hideStartTextIfSetToNone}}">Click reward at top to finish!</h2>
+<img src="img/GreenPotion.png"  style="margin-top:{{marginTop1}}%; margin-left:{{marginLeft1}}%; width:35%; position:absolute; display:{{hideImage1IfSetToNone}};" ng-click = "imageClicked(1)"/>
+<img src="img/YellowPotion.png" style="margin-top:{{marginTop2}}%; margin-left:{{marginLeft2}}%; width:35%; position:absolute; display:{{hideImage2IfSetToNone}};" ng-click = "imageClicked(2)"/>
+<img src="img/Gold.png" style="margin-top:{{marginTop3}}%; margin-left:{{marginLeft3}}%; width:25%; position:absolute; display:{{hideImage3IfSetToNone}};" ng-click = "imageClicked(3)"/>
+</ion-view>
