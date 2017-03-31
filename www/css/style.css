@@ -1,12 +1,4 @@
 /* Empty. Add your own CSS if you like */
-/*
-button{
-	background-image: url("/img/ButtonBackground.png");
-    background-repeat: none;
-    background-size: cover;
-    background-position:center;
-    border: none;
-}*/
 
 .homeBackground {
     background: url('../img/Background.png') no-repeat; 
@@ -51,4 +43,9 @@ button{
     -webkit-background-size: cover; 
     -moz-background-size: cover; 
     background-size: cover;
+}
+
+/* is not our app item, but an element in a scroll list*/
+.item{
+	background-color: #C8C8C8;
 }

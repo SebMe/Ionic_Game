@@ -29,7 +29,7 @@ myApp.controller('potionCollectMinigameViewController', function ($scope, $cordo
 			if($scope.score < scoreForCooldownReduction){$scope.rewardBackgroundColor = null;}
 			if($scope.score >= scoreForCooldownReduction && $scope.score < scoreForItem){$scope.rewardBackgroundColor = 'limegreen';};
 			if($scope.score >= scoreForItem && $scope.score < scoreForDiscovery){$scope.rewardBackgroundColor = '#ffb90f';};
-			if($scope.score >= scoreForDiscovery){$scope.rewardBackgroundColor = '#600000';};
+			if($scope.score >= scoreForDiscovery){$scope.rewardBackgroundColor = 'lightblue';};
 			removeImageAfterXTime(1000 - $scope.score/2, 1);	
 			removeImageAfterXTime(1000 - $scope.score/2, 2);
 		}, 2000 - $scope.score);
@@ -113,8 +113,8 @@ myApp.controller('potionCollectMinigameViewController', function ($scope, $cordo
 				user.OwnedItems.push($scope.randomRolledItem);
 			};
 			if(reward >= scoreForDiscovery){
-				databaseFunctions.getAllExistingDiscoveries($cordovaSQLite).then(function(allExistingDiscoveries){
-					$scope.popupBackgroundColor = '#600000';
+				$scope.popupBackgroundColor = 'lightblue';
+				databaseFunctions.getAllExistingDiscoveries($cordovaSQLite).then(function(allExistingDiscoveries){					
 					var discoveryIndex = Math.round(Math.random()*100) % allExistingDiscoveries.length;
 					$scope.discoveryReward = allExistingDiscoveries[discoveryIndex];
 					addDiscoveryToUser($scope.discoveryReward, user);
@@ -124,7 +124,7 @@ myApp.controller('potionCollectMinigameViewController', function ($scope, $cordo
 			}else{
 				user.AmountOfGold += reward;
 				databaseFunctions.updateAllUserData($cordovaSQLite, user);
-			};							
+			};				
 		});
 		
 		resetValuesToInit();

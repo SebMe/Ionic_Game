@@ -11,22 +11,22 @@
     </ion-scroll>
 
         <ion-scroll overflow-scroll="true" zooming="true" direction="y" style="width: 100%; height: 40%; display: {{displayBuyPotionList}};">
-            <a ng-repeat="potion in potionsToBuy | orderBy:'Class' " class="item item-thumbnail-left" style="margin-left:5%; margin-right:5%; margin-top:5%; border: none; border-bottom:groove;" ng-click="buyPotion(potion)">
+            <a ng-repeat="potion in potionsToBuy | orderBy:['Class', 'Rank'] " class="item item-thumbnail-left" style="margin-left:5%; margin-right:5%; margin-top:5%; border: none; border-bottom:groove;" ng-click="buyPotion(potion)">
                 <img src="img/{{potion.ImageFilename}}">
                 <h2>{{potion.Name}}</h2>
                 <p>{{potion.Description}}</p>
                 <p>Rank: {{potion.Rank}}</p>
-                <p>Price: {{potion.Price}}</p>
+                <p>Price: {{potion.PriceDiscountAdjusted}}</p>
             </a>
         </ion-scroll>
 
         <ion-scroll overflow-scroll="true" zooming="true" direction="y" style="width: 100%; height: 40%; display: {{displaySellPotionList}};">
-            <a ng-repeat="potion in user.OwnedPotions | orderBy:'Class' " class="item item-thumbnail-left" style="margin-left:5%; margin-right:5%; margin-top:5%; border: none; border-bottom:groove;" ng-click="sellPotion(potion)">
+            <a ng-show="potion.Amount" ng-repeat="potion in user.OwnedPotions | orderBy:['Class', 'Rank'] " class="item item-thumbnail-left" style="margin-left:5%; margin-right:5%; margin-top:5%; border: none; border-bottom:groove;" ng-click="sellPotion(potion)">
                 <img src="img/{{potion.ImageFilename}}">
                 <h2>{{potion.Amount + ' ' + potion.Name}}</h2>
                 <p>{{potion.Description}}</p>
                 <p>Rank: {{potion.Rank}}</p>
-                <p>Price: {{potion.Price}}</p>
+                <p>Price: {{potion.HalfPriceDiscountAdjusted}}</p>
             </a>
         </ion-scroll>
 
@@ -39,14 +39,14 @@
     </ion-scroll>
 
     <ion-scroll overflow-scroll="true" zooming="true" direction="y" style="width: 100%; height: 40%; display: {{displaySellItemList}};">
-        <a ng-repeat="item in user.OwnedItems | orderBy:'Class' " class="item item-thumbnail-left" style="margin-left:5%; margin-right:5%; margin-top:5%; border: none; border-bottom:groove; background-color:{{item.BackgroundColor}}" ng-click="showSellItemAreYouSurePopup(item)">
+        <a ng-repeat="item in user.OwnedItems | orderBy:'Class' " class="item item-thumbnail-left" ng-show="!item.SellItFlag" style="margin-left:5%; margin-right:5%; margin-top:5%; border: none; border-bottom:groove; background-color:{{item.BackgroundColor}}" ng-click="showSellItemAreYouSurePopup(item)">
             <img src="img/{{item.ImageFilename}}">
                  <h2>Price: {{item.Price}}</h2>     
-                 <h4>+ {{item.ChanceExtraPotionOnUpgrade}}% chance for extra potion on upgrade</h4>
-                 <h4>+ {{item.DiscoveryCDReductionPercentage}}% discovery cooldown reduction</h4>
-                 <h4>+ {{item.TraderDiscountPercentage}}% trader discount</h4>
-                 <h4>+ {{item.ExtraPotionOnQuest}} potion per solved quest</h4>
-                 <h4>+ {{item.ExtraGoldOnDiscovery}} extra gold on discovery</h4>
+                 <h4 ng-show="{{item.ChanceExtraPotionOnUpgrade}}">+ {{item.ChanceExtraPotionOnUpgrade}}% chance for extra potion on upgrade</h4>
+                 <h4 ng-show="{{item.DiscoveryCDReductionPercentage}}">+ {{item.DiscoveryCDReductionPercentage}}% discovery cooldown reduction</h4>
+                 <h4 ng-show="{{item.TraderDiscountPercentage}}">+ {{item.TraderDiscountPercentage}}% trader discount</h4>
+                 <h4 ng-show="{{item.ExtraPotionOnQuest}}">+ {{item.ExtraPotionOnQuest}} potion per solved quest</h4>
+                 <h4 ng-show="{{item.ExtraGoldOnDiscovery}}">+ {{item.ExtraGoldOnDiscovery}} extra gold on discovery</h4>
         </a>
     </ion-scroll>
 </ion-view>

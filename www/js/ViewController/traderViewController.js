@@ -1,14 +1,18 @@
-myApp.controller('traderViewController', function ($scope, $cordovaSQLite, $cordovaNativeAudio, $timeout, $ionicPopup, databaseFunctions, itemService) {
-    $scope.$on('$ionicView.enter', function () {
-        databaseFunctions.getUser($cordovaSQLite).then(function (user) {            
-            $scope.user = user;
-
-            for (var i = 0; i < user.OwnedItems.length; i++) {
+myApp.controller('traderViewController', function ($scope, $cordovaSQLite, $cordovaNativeAudio, $timeout, $ionicPopup, $q, databaseFunctions, itemService) {
+    $scope.$on('$ionicView.enter', function () {		
+		databaseFunctions.getUser($cordovaSQLite).then(function (user) {            	
+			for (var i = 0; i < user.OwnedItems.length; i++) {
                 if (user.OwnedItems[i].Equipped == 'true') {
                     user.OwnedItems[i].BackgroundColor = 'limegreen';
                 }
             };
 
+			for (var i = 0; i < user.OwnedPotions.length; i++) {
+                var potionPriceAdjustedToDiscount = user.OwnedPotions[i].Price - Math.round(user.OwnedPotions[i].Price * user.TraderDiscountPercentage / 100);
+				user.OwnedPotions[i].PriceDiscountAdjusted = potionPriceAdjustedToDiscount;
+				user.OwnedPotions[i].HalfPriceDiscountAdjusted = Math.round(potionPriceAdjustedToDiscount/2);
+            };
+			
             // Pre select some modus, or in case we returned to his view, reset the item prices
             var backgroundColorSelected = 'limegreen';
             var buyPotionSelected = $scope.buyColor == backgroundColorSelected;
@@ -16,7 +20,8 @@ myApp.controller('traderViewController', function ($scope, $cordovaSQLite, $cord
             var buyItemSelected = $scope.buyItemColor == backgroundColorSelected;
             var sellItemSelected = $scope.sellItemColor == backgroundColorSelected;
             var noModusSelected = (buyPotionSelected || sellPotionSelected || buyItemSelected || sellItemSelected) != true;
-            if (noModusSelected) {
+            
+			if (noModusSelected) {
                 $scope.buyColor = backgroundColorSelected;
 				buyPotionSelected = true;
             };
@@ -30,11 +35,18 @@ myApp.controller('traderViewController', function ($scope, $cordovaSQLite, $cord
             } else if (sellItemSelected) {
                 $scope.showAllUserItems();
             };
+			
+			$scope.user = user;
         });
 
         // Preload sounds that can be used in the view
-        $cordovaNativeAudio.preloadSimple('moneySound', 'sounds/money.mp3');
-    });
+        //$cordovaNativeAudio.preloadSimple('moneySound', 'sounds/money.mp3');
+		//$cordovaNativeAudio.preloadSimple('successSound', 'sounds/success.mp3');
+	});
+	
+	$scope.$on('$ionicView.beforeLeave', function () {
+		databaseFunctions.updateAllUserData($cordovaSQLite, $scope.user);
+	});
 
     var showListForModus = function (modus) {
         $scope.displayBuyPotionList = 'none';
@@ -78,7 +90,7 @@ myApp.controller('traderViewController', function ($scope, $cordovaSQLite, $cord
         databaseFunctions.getAllExistingPotions($cordovaSQLite).then(function (allPotions) {
             for (var i = 0; i < allPotions.length; i++) {
                 var potionPriceAdjustedToDiscount = allPotions[i].Price - Math.round(allPotions[i].Price * $scope.user.TraderDiscountPercentage / 100);
-                allPotions[i].Price = potionPriceAdjustedToDiscount;
+                allPotions[i].PriceDiscountAdjusted = potionPriceAdjustedToDiscount;
             };
             $scope.potionsToBuy = allPotions;
             showListForModus('buyPotions');
@@ -88,11 +100,8 @@ myApp.controller('traderViewController', function ($scope, $cordovaSQLite, $cord
 
     // Called by click on the x-axis buttons that select the modus
     $scope.showAllUserpotions = function () {
-        databaseFunctions.getUser($cordovaSQLite).then(function (user) {
-            $scope.user = user;
-            showListForModus('sellPotions');
-            setBackgroundColorForModus('sellPotions');
-        });
+		showListForModus('sellPotions');
+		setBackgroundColorForModus('sellPotions');
     };
     
     // Called by click on the x-axis buttons that select the modus
@@ -105,47 +114,40 @@ myApp.controller('traderViewController', function ($scope, $cordovaSQLite, $cord
 
     // Called by click on the x-axis buttons that select the modus
     $scope.showAllUserItems = function () {
-        databaseFunctions.getUser($cordovaSQLite).then(function (user) {
-            $scope.user = user;
-
-            for (var i = 0; i < user.OwnedItems.length; i++) {
-                if (user.OwnedItems[i].Equipped == 'true') {
-                    user.OwnedItems[i].BackgroundColor = 'limegreen';
-                }
-            };
-
-            showListForModus('sellItems');
-            setBackgroundColorForModus('sellItems');
-        });
+		for (var i = 0; i < $scope.user.OwnedItems.length; i++) {
+			if ($scope.user.OwnedItems[i].Equipped == 'true') {
+				$scope.user.OwnedItems[i].BackgroundColor = 'limegreen';
+			}
+		};
+		showListForModus('sellItems');
+		setBackgroundColorForModus('sellItems');
     };
 
     // Called by click on the y-axis scroll-list element to buy that potion
-    $scope.buyPotion = function (potion) {
-        var user = $scope.user;
-        // Potion retrieved from the Potions_Table has no Amount field, need to add Amount since a potion the user possesses has an Amount
-        potion.Amount = 1;
-        if (user.AmountOfGold - potion.Price >= 0) {
-            var addedPotion = false;
-            // Check all potions the user has, if found increase amount
-            for (var i = 0; i < user.OwnedPotions.length; i++) {
-                if (potion.ID == user.OwnedPotions[i].ID) {
-                    user.OwnedPotions[i].Amount++;
-                    user.AmountOfGold -= potion.Price;
-                    addedPotion = true;
-                };
-            };
-            // User didnt have the potion yet, add it
-            if (addedPotion == false) {
-                user.OwnedPotions.push(potion);
-                user.AmountOfGold -= potion.Price;
-            };
-
-            $scope.traderImage = 'TraderReaction.png'
-            $timeout(function () {
-                $scope.traderImage = 'Trader.png';
-            }, 500);
-        };
-        databaseFunctions.updateAllUserData($cordovaSQLite, user);
+	$scope.buyPotion = function (potion) {		
+	 // Potion retrieved from the Potions_Table has no Amount field, need to add Amount since a potion the user possesses has an Amount
+		potion.Amount = 1;
+		if ($scope.user.AmountOfGold - potion.Price >= 0) {
+			var addedPotion = false;
+			// Check all potions the user has, if found increase amount
+			for (var i = 0; i < $scope.user.OwnedPotions.length; i++) {
+				if (potion.ID == $scope.user.OwnedPotions[i].ID) {
+					$scope.user.OwnedPotions[i].Amount++;
+					$scope.user.AmountOfGold -= potion.PriceDiscountAdjusted;
+					addedPotion = true;
+				};
+			};
+			// User didnt have the potion yet, add it
+			if (addedPotion == false) {
+				$scope.user.OwnedPotions.push(potion);
+				$scope.user.AmountOfGold -= potion.PriceDiscountAdjusted;
+			};		
+			
+			$scope.traderImage = 'TraderReaction.png'
+			$timeout(function () {
+				$scope.traderImage = 'Trader.png';
+			}, 500);
+		}; 	  
     };
 
     // Called by click on the y-axis scroll-list element to sell that potion
@@ -155,21 +157,16 @@ myApp.controller('traderViewController', function ($scope, $cordovaSQLite, $cord
         for (var i = 0; i < user.OwnedPotions.length; i++) {
             if (potion.ID == user.OwnedPotions[i].ID && user.OwnedPotions[i].Amount > 0) {
                 user.OwnedPotions[i].Amount--;
-                user.AmountOfGold += potion.Price;
+                user.AmountOfGold += potion.HalfPriceDiscountAdjusted;
                 soldPotionIndex = i;
                 // Play a Money Sound (is native, so has to be commented out for app to still work while pc-testing in chrome)
-                $cordovaNativeAudio.play('moneySound');
+                //$cordovaNativeAudio.play('moneySound');
                 $scope.traderImage = 'TraderReaction.png'
                 $timeout(function () {
                     $scope.traderImage = 'Trader.png';
                 }, 500);
             };
         };
-        databaseFunctions.updateAllUserData($cordovaSQLite, user);
-        // Remove from list if amount is 0, otherwise would be shown in list with amount 0
-        if (user.OwnedPotions[soldPotionIndex].Amount == 0) {
-            user.OwnedPotions.splice(soldPotionIndex, 1);
-        }
     };
 
     // Called when the user clicked an itemClass to buy it
@@ -200,8 +197,7 @@ myApp.controller('traderViewController', function ($scope, $cordovaSQLite, $cord
 
     // Called when the user accepted to buy this item
     $scope.buyItem = function (itemClass) {              
-        var user = $scope.user;
-        if (user.AmountOfGold >= itemClass.Price) {
+        if ($scope.user.AmountOfGold >= itemClass.Price) {
 
             $scope.traderImage = 'TraderReaction.png'
             $timeout(function () {
@@ -209,14 +205,11 @@ myApp.controller('traderViewController', function ($scope, $cordovaSQLite, $cord
             }, 500);
 
 			var fullyRolledItem = itemService.createItem(itemClass);     
-            itemService.showItemPopup($scope, fullyRolledItem);
-			
-            user.OwnedItems.push(fullyRolledItem);
-            user.AmountOfGold -= itemClass.Price;
-            databaseFunctions.updateAllUserData($cordovaSQLite, user);
-            // Reset the StoreItFlag, otherwise would be added to the database again with next call to updateAllUserData
-            var indexOfNewlyAddedItem = user.OwnedItems.length - 1;
-            user.OwnedItems[indexOfNewlyAddedItem].StoreItFlag = false;
+			itemService.showItemPopup($scope, fullyRolledItem);
+			//$cordovaNativeAudio.play('successSound');
+						
+            $scope.user.OwnedItems.push(fullyRolledItem);
+            $scope.user.AmountOfGold -= itemClass.Price;      
         };
     };
 
@@ -236,11 +229,11 @@ myApp.controller('traderViewController', function ($scope, $cordovaSQLite, $cord
                         '<style>.popup {min-width:90%;} .popup-body{ background-color: #c8c8c8} .popup-head{ background-color: {{sellTitleColor}}}</style>' +
                         '<div ng-click=closeItemPopup()>' +
                         '<img src="img/{{userItemToSell.ImageFilename}}" style="margin-right:15%;" >' +
-                        '     <h5>+ {{userItemToSell.ChanceExtraPotionOnUpgrade}}% chance for extra potion on upgrade</h5>' +
-                        '     <h5>+ {{userItemToSell.DiscoveryCDReductionPercentage}}% discovery cooldown reduction</h5>' +
-                        '     <h5>+ {{userItemToSell.TraderDiscountPercentage}}% trader discount</h5> ' +
-                        '     <h5>+ {{userItemToSell.ExtraPotionOnQuest}} potion per solved quest</h5>' +
-                        '     <h5>+ {{userItemToSell.ExtraGoldOnDiscovery}} extra gold on discovery</h5>' +
+                        ' <h5 ng-show="{{userItemToSell.ChanceExtraPotionOnUpgrade}}">+ {{userItemToSell.ChanceExtraPotionOnUpgrade}}% chance for extra potion on upgrade</h5>' +
+					'     <h5 ng-show="{{userItemToSell.DiscoveryCDReductionPercentage}}">+ {{userItemToSell.DiscoveryCDReductionPercentage}}% discovery cooldown reduction</h5>' +
+					'     <h5 ng-show="{{userItemToSell.TraderDiscountPercentage}}">+ {{userItemToSell.TraderDiscountPercentage}}% trader discount</h5> ' +
+					'     <h5 ng-show="{{userItemToSell.ExtraPotionOnQuest}}">+ {{userItemToSell.ExtraPotionOnQuest}} potion per solved quest</h5>' +
+					'     <h5 ng-show="{{userItemToSell.ExtraGoldOnDiscovery}}">+ {{userItemToSell.ExtraGoldOnDiscovery}} extra gold on discovery</h5>'+
                         '</div>',
 
             title: $scope.sellTitle,
@@ -261,34 +254,39 @@ myApp.controller('traderViewController', function ($scope, $cordovaSQLite, $cord
 
     // Called when the user accepted to sell this item
     $scope.sellItem = function (item) {
-        //$cordovaNativeAudio.play('moneySound');
+        var user = $scope.user;
+		//$cordovaNativeAudio.play('moneySound');
         $scope.traderImage = 'TraderReaction.png'
         $timeout(function () {
             $scope.traderImage = 'Trader.png';
         }, 500);
 
-        var user = $scope.user;
-        var soldItemIndex;
-        for (var i = 0; i < user.OwnedItems.length; i++) {
-            if (user.OwnedItems[i].ID == item.ID) {
-                user.OwnedItems[i].SellItFlag = true;
-                user.OwnedItems[i].StoreItFlag = false;
-                user.OwnedItems[i].UpdateItFlag = false;
-                soldItemIndex = i;
-                
-                if (user.OwnedItems[i].Equipped == 'true') {
-                    user.ChanceExtraPotionOnUpgrade -= user.OwnedItems[i].ChanceExtraPotionOnUpgrade;
-                    user.ExtraPotionOnQuest -= user.OwnedItems[i].ExtraPotionOnQuest;
-                    user.ExtraGoldOnDiscovery -= user.OwnedItems[i].ExtraGoldOnDiscovery;
-                    user.DiscoveryCDReductionPercentage -= user.OwnedItems[i].DiscoveryCDReductionPercentage;
-                    user.TraderDiscountPercentage -= user.OwnedItems[i].TraderDiscountPercentage;
-                };
-            };
-        };
+		var itemWasBoughtButNotYetStoredInDB = item.ID < 0;
+        if(itemWasBoughtButNotYetStoredInDB){
+			for (var i = 0; i < user.OwnedItems.length; i++) {
+				if (user.OwnedItems[i].ID == item.ID) {
+					user.OwnedItems.splice(i, 1);							
+				};
+			};
+		} else {
+			var soldItemIndex;
+			for (var i = 0; i < user.OwnedItems.length; i++) {
+				if (user.OwnedItems[i].ID == item.ID) {
+					user.OwnedItems[i].SellItFlag = true;
+					user.OwnedItems[i].StoreItFlag = false;
+					user.OwnedItems[i].UpdateItFlag = false;
+					soldItemIndex = i;
 
+					if (user.OwnedItems[i].Equipped == 'true') {
+						user.ChanceExtraPotionOnUpgrade -= user.OwnedItems[i].ChanceExtraPotionOnUpgrade;
+						user.ExtraPotionOnQuest -= user.OwnedItems[i].ExtraPotionOnQuest;
+						user.ExtraGoldOnDiscovery -= user.OwnedItems[i].ExtraGoldOnDiscovery;
+						user.DiscoveryCDReductionPercentage -= user.OwnedItems[i].DiscoveryCDReductionPercentage;
+						user.TraderDiscountPercentage -= user.OwnedItems[i].TraderDiscountPercentage;
+					};
+				};
+			};
+		};
         user.AmountOfGold += item.Price;
-        databaseFunctions.updateAllUserData($cordovaSQLite, user);
-        // The item is deleted from database, now remove it from the current loaded user structure as well
-        user.OwnedItems.splice(soldItemIndex, 1);
     };
 });

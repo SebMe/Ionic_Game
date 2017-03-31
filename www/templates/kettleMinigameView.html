@@ -1,0 +1,16 @@
+<ion-view ng-controller="kettleMinigameViewController" class="homeBackground">
+
+<h1 style="position:absolut; background-color:{{rewardBackgroundColor}};" ng-click="takeReward(score)">{{score}} <img src="img/Gold.png" style="height: 1em;"</h1>
+<h1 align="center" style="margin-top:10%; display:{{hideStartTextIfSetToNone}}" ng-click="startGame()">Start</h1>
+<h2 align="center" style="display:{{hideStartTextIfSetToNone}}">Click score at top-left to finish!</h2>
+
+<div style="display:{{pictureA.hidePictureIfSetToNone}}; width: {{pictureA.width * 2}}%; height: {{pictureA.height * 2}}%; top: {{pictureA.marginTop - pictureA.height/2}}%; left: {{pictureA.marginLeft - pictureA.width/2}}%; position:absolute;" ng-click="pictureClicked('pictureA')"/>
+	<img src="img/{{pictureA.image}}" style="width: 50%; height: 50%; top: 25%; left:25%; position:absolute;">
+</div>
+
+<div style="display:{{pictureB.hidePictureIfSetToNone}}; width: {{pictureB.width * 2}}%; height: {{pictureB.height * 2}}%; top: {{pictureB.marginTop - pictureB.height/2}}%; left: {{pictureB.marginLeft - pictureB.width/2}}%; position:absolute;" ng-click="pictureClicked('pictureB')"/>
+	<img src="img/{{pictureB.image}}" style="width: 50%; height: 50%; top: 25%; left:25%; position:absolute;">
+</div>
+
+<img src="img/{{kettleImageFilename}}" style="display:{{pictureKettle.hidePictureIfSetToNone}}; width:{{pictureKettle.width}}%; height:{{pictureKettle.height}}%; top: {{pictureKettle.marginTop}}%; left: {{pictureKettle.marginLeft}}%; position:absolute;"/>
+</ion-view>

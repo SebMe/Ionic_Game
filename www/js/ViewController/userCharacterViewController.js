@@ -70,11 +70,11 @@ myApp.controller('userCharacterViewController', function ($scope, $cordovaSQLite
                      '<ion-list>                                ' +
                     '  <ion-item ng-repeat="item in user.OwnedItems |filter: class= Class" style="background-color: {{item.BackgroundColor || \'#c8c8c8\'}}"; ng-click = equipItem(item)>' +
                                  '<img src="img/{{item.ImageFilename}}" style="margin-right:60%"; >' +
-                            '     <h4>+ {{item.ChanceExtraPotionOnUpgrade}}% chance for extra potion on upgrade</h4>' +
-                            '     <h4>+ {{item.DiscoveryCDReductionPercentage}}% discovery cooldown reduction</h4>' +
-                            '     <h4>+ {{item.TraderDiscountPercentage}}% trader discount</h4> ' +
-                            '     <h4>+ {{item.ExtraPotionOnQuest}} potion per solved quest</h4>' +
-                            '     <h4>+ {{item.ExtraGoldOnDiscovery}} extra gold on discovery</h4>' +
+                            '     <h4 ng-show="{{item.ChanceExtraPotionOnUpgrade}}">+ {{item.ChanceExtraPotionOnUpgrade}}% chance for extra potion on upgrade</h4>' +
+                            '     <h4 ng-show="{{item.DiscoveryCDReductionPercentage}}">+ {{item.DiscoveryCDReductionPercentage}}% discovery cooldown reduction</h4>' +
+                            '     <h4 ng-show="{{item.TraderDiscountPercentage}}">+ {{item.TraderDiscountPercentage}}% trader discount</h4> ' +
+                            '     <h4 ng-show="{{item.ExtraPotionOnQuest}}">+ {{item.ExtraPotionOnQuest}} potion per solved quest</h4>' +
+                            '     <h4 ng-show="{{item.ExtraGoldOnDiscovery}}">+ {{item.ExtraGoldOnDiscovery}} extra gold on discovery</h4>' +
                     '  </ion-item>' +
                       '</ion-list>',
 

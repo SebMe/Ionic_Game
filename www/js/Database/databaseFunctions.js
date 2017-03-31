@@ -1,11 +1,15 @@
-myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
-
+myApp.factory('databaseFunctions', function ($cordovaSQLite, $q, $timeout) {
+	
+	var globalQ = $q.defer();
+	globalQ.resolve(this);
+	var globalThis = this;
+	
     // Private GET helper, you should not need these
-    this.executeQuery = function (query, parameters) {
-        var q = $q.defer();
+    this.executeQuery = function (query, parameters) {									     
+	   var q = $q.defer();  
         parameters = parameters || []; // Use empty field in case no parameters are used
         $cordovaSQLite.execute(db, query, parameters).then(
-            // Query execute was successfull (positive promise)
+			// Query execute was successfull (positive promise)
             function (result) {
                 q.resolve(result);
             },
@@ -16,7 +20,7 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
         return q.promise;
     };
 
-    this.getAllQuestsWithoutAnyTableJoin = function ($cordovaSQLite) {
+    this.getAllQuestsWithoutAnyTableJoin = function () {
         var allExistingQuests = [];
         var query = 'SELECT * from Quest_Table';
         return this.executeQuery(query, []).then(function (result) {
@@ -26,6 +30,7 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
                         ID: null,
                         Name: null,
                         Description: null,
+						Rubys: 0,
                         Rewardmoney: null,
                         Type: null,
                         RewardPotions: [],
@@ -35,6 +40,7 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
                     questValues.ID = result.rows.item(i).ID;
                     questValues.Name = result.rows.item(i).Name;
                     questValues.Description = result.rows.item(i).Description;
+					questValues.Rubys = result.rows.item(i).Rubys;
                     questValues.Rewardmoney = result.rows.item(i).Rewardmoney;
                     questValues.Type = result.rows.item(i).Type;
                     allExistingQuests.push(questValues);
@@ -44,7 +50,7 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
         });
     };
 
-    this.getDiscoveriesForQuests = function ($cordovaSQLite) {
+    this.getDiscoveriesForQuests = function () {
 
         var query = 'SELECT * from Discovery_Table join RequiredQuestDiscovery_Table on Discovery_Table.ID = RequiredQuestDiscovery_Table.Discovery_TableID';
 
@@ -71,7 +77,7 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
         });
     };
 
-    this.getRequiredPotionsForQuests = function ($cordovaSQLite) {
+    this.getRequiredPotionsForQuests = function () {
         var allRequiredQuestPotions = [];
         var query = 'SELECT * from Potion_Table join RequiredQuestPotion_Table on Potion_Table.ID = RequiredQuestPotion_Table.Potion_TableID';
         return this.executeQuery(query, []).then(function (result) {
@@ -104,7 +110,7 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
         });
     };
 
-    this.getRewardPotionsForQuests = function ($cordovaSQLite) {
+    this.getRewardPotionsForQuests = function () {
         var allRewardQuestPotions = [];
         var query = 'SELECT * from Potion_Table join RewardQuestPotion_Table on Potion_Table.ID = RewardQuestPotion_Table.Potion_TableID';
         return this.executeQuery(query, []).then(function (result) {
@@ -137,11 +143,13 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
         });
     };
 
-    this.getUserWithoutAnyAdditionalData = function ($cordovaSQLite) {
-        var userValues = {
+    this.getUserWithoutAnyAdditionalData = function () {	
+	   var userValues = {
             ID: null,
             AmountOfGold: null,
             CurrentLevel: null,
+			Name: null,
+			Rubys: 0,
             OwnedPotions: [],
             OwnedItems: [],
             SolvedQuests: [],
@@ -160,6 +168,8 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
                 userValues.ID = result.rows.item(0).ID;
                 userValues.AmountOfGold = result.rows.item(0).AmountOfGold;
                 userValues.CurrentLevel = result.rows.item(0).CurrentLevel;
+				userValues.Name = result.rows.item(0).Name;
+				userValues.Rubys = result.rows.item(0).Rubys;
                 userValues.ChanceExtraPotionOnUpgrade = result.rows.item(0).ChanceExtraPotionOnUpgrade;
                 userValues.ExtraPotionOnQuest = result.rows.item(0).ExtraPotionOnQuest;
                 userValues.ExtraGoldOnDiscovery = result.rows.item(0).ExtraGoldOnDiscovery;
@@ -170,7 +180,7 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
         });
     };
 
-    this.getUserSolvedQuestIDs = function ($cordovaSQLite) {
+    this.getUserSolvedQuestIDs = function () {
         var solvedQuestIDs = [];
         var userID = 1;
         var query = 'SELECT * from SolvedQuests_Table where User_TableID = ?';
@@ -185,7 +195,7 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
         });
     };
 
-    this.getUserOwnedPotion = function ($cordovaSQLite) {
+    this.getUserOwnedPotion = function () {
         var ownedPotions = [];
         var userID = 1;
         var query = 'SELECT * from Potion_Table join Userpotion_Table on Potion_Table.ID = Userpotion_Table.Potion_TableID where User_TableID = ?';
@@ -217,7 +227,7 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
         });
     };
     
-    this.getUserFoundDiscoveries = function ($cordovaSQLite) {
+    this.getUserFoundDiscoveries = function () {
         var foundDiscoveries = [];
         var userID = 1;
         var query = 'SELECT * FROM Discovery_Table JOIN FoundDiscoveries_Table on Discovery_Table.ID = FoundDiscoveries_Table.Discovery_TableID where User_TableID = ?';
@@ -242,7 +252,7 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
         });
     };
 
-    this.getUserDiscoveryData = function ($cordovaSQLite) {
+    this.getUserDiscoveryData = function () {
         var discoveriesWithData = [];
         var userID = 1;
         var query = 'SELECT * FROM Discovery_Table JOIN UserDiscoveryData_Table on Discovery_Table.ID = UserDiscoveryData_Table.Discovery_TableID where User_TableID = ?';
@@ -266,7 +276,7 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
         });
     };
 
-    this.getUserOwnedItems = function ($cordovaSQLite) {
+    this.getUserOwnedItems = function () {
         var ownedItems = [];
         var userID = 1;
         var query = 'SELECT * from UserItem_Table where User_TableID = ?';
@@ -307,7 +317,7 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
 
     // Private SET helper, you should not need these
     this.updateUserpotions = function ($cordovaSQLite, userData) {
-        var insert_userpotions_query = 'INSERT OR IGNORE INTO Userpotion_Table (User_TableID, Potion_TableID) VALUES (?, ?)';  // the IGNORE only works on primary key or unique constraints
+		var insert_userpotions_query = 'INSERT OR IGNORE INTO Userpotion_Table (User_TableID, Potion_TableID) VALUES (?, ?)';  // the IGNORE only works on primary key or unique constraints
         var update_userpotions_query = 'UPDATE Userpotion_Table SET Amount = ? WHERE User_TableID = ? AND Potion_TableID = ?';
         var delete_userpotions_query = 'DELETE FROM Userpotion_Table WHERE User_TableID = ? AND Potion_TableID = ?';
         var potionTableLength = 0;
@@ -387,6 +397,7 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
         for (var x = 0; x < itemCount; x++) {
             var itemID = userItems[x].ID;
             if (userItems[x].StoreItFlag == true) {
+				userItems[x].StoreItFlag = false;
                 $cordovaSQLite.execute(db, insert_items_query,
                     [userID, userItems[x].Class, userItems[x].Price, userItems[x].ChanceExtraPotionOnUpgrade, userItems[x].ExtraPotionOnQuest,
                         userItems[x].ExtraGoldOnDiscovery, userItems[x].DiscoveryCDReductionPercentage, userItems[x].TraderDiscountPercentage, userItems[x].ImageFilename, userItems[x].Equipped]);
@@ -541,60 +552,70 @@ myApp.factory('databaseFunctions', function ($cordovaSQLite, $q) {
         });
     };
   
-    this.getUser = function ($cordovaSQLite) {
-        var user = this.getUserWithoutAnyAdditionalData($cordovaSQLite);
-        var allQuests = this.getAllExistingQuests($cordovaSQLite);
-        var solvedQuestIDs = this.getUserSolvedQuestIDs($cordovaSQLite);
-        var ownedPotions = this.getUserOwnedPotion($cordovaSQLite);
-        var foundDiscoveries = this.getUserFoundDiscoveries($cordovaSQLite);
-        var discoveryData = this.getUserDiscoveryData($cordovaSQLite);
-        var ownedItems = this.getUserOwnedItems($cordovaSQLite);
+  
+    this.getUser = function ($cordovaSQLite) {					
+		return globalQ.promise.then(function(resolvedThis){
+			globalQ = $q.defer();
+			var user = resolvedThis.getUserWithoutAnyAdditionalData();	
+			var allQuests = resolvedThis.getAllExistingQuests();
+			var solvedQuestIDs = resolvedThis.getUserSolvedQuestIDs();
+			var ownedPotions = resolvedThis.getUserOwnedPotion();
+			var foundDiscoveries = resolvedThis.getUserFoundDiscoveries();
+			var discoveryData = resolvedThis.getUserDiscoveryData();
+			var ownedItems = resolvedThis.getUserOwnedItems();
+			
+			return $q.all([user, allQuests, solvedQuestIDs, ownedPotions, foundDiscoveries, discoveryData, ownedItems, resolvedThis]).then(function (dataset) {
 
-        return $q.all([user, allQuests, solvedQuestIDs, ownedPotions, foundDiscoveries, discoveryData, ownedItems]).then(function (dataset) {
-            var set_user = dataset[0];
-            var set_allQuests = dataset[1];
-            var set_solvedQuestIDs = dataset[2];
-            var set_ownedPotions = dataset[3];
-            var set_foundDiscoveries = dataset[4];
-            var set_discoveryData = dataset[5];
-            var set_ownedItems = dataset[6];
+				var set_user = dataset[0];
+				var set_allQuests = dataset[1];
+				var set_solvedQuestIDs = dataset[2];
+				var set_ownedPotions = dataset[3];
+				var set_foundDiscoveries = dataset[4];
+				var set_discoveryData = dataset[5];
+				var set_ownedItems = dataset[6];
+				var set_resolvedThis = dataset[7];
 
-            // Filter out the solved quests from the list of all quests
-            for (var i = 0; i < set_allQuests.length; i++) {
-                for (var x = 0; x < set_solvedQuestIDs.length; x++) {
-                    if (set_allQuests[i].ID == set_solvedQuestIDs[x]) {
-                        set_user.SolvedQuests.push(set_allQuests[i]);
-                    };
-                };
-            };
+				// Filter out the solved quests from the list of all quests
+				for (var i = 0; i < set_allQuests.length; i++) {
+					for (var x = 0; x < set_solvedQuestIDs.length; x++) {
+						if (set_allQuests[i].ID == set_solvedQuestIDs[x]) {
+							set_user.SolvedQuests.push(set_allQuests[i]);
+						};
+					};
+				};
 
-            // Get the potions the user owns
-            set_user.OwnedPotions = set_ownedPotions;
+				// Get the potions the user owns
+				set_user.OwnedPotions = set_ownedPotions;
 
-            // Get the discoveries the user owns
-            set_user.FoundDiscoveries = set_foundDiscoveries;
+				// Get the discoveries the user owns
+				set_user.FoundDiscoveries = set_foundDiscoveries;
 
-            // Get the discoveryData for the user
-            set_user.DataForDiscoveries = set_discoveryData;
+				// Get the discoveryData for the user
+				set_user.DataForDiscoveries = set_discoveryData;
 
-            // Get the items the user owns
-            set_user.OwnedItems = set_ownedItems;
-
-            return set_user;
-        });
+				// Get the items the user owns
+				set_user.OwnedItems = set_ownedItems;	
+				globalQ.resolve(set_resolvedThis);
+				return set_user;
+			});
+		});
     };
 
     // Functions to update the db data    
     this.updateAllUserData = function ($cordovaSQLite, userData) {
-        // Update the User_Table
-        var update_user_query = 'UPDATE User_Table SET AmountOfGold = ?, CurrentLevel = ?, ChanceExtraPotionOnUpgrade = ?, ExtraPotionOnQuest = ?, ExtraGoldOnDiscovery = ?, DiscoveryCDReductionPercentage = ?, TraderDiscountPercentage = ? WHERE ID = ?';
-        this.executeQuery(update_user_query, [userData.AmountOfGold, userData.CurrentLevel, userData.ChanceExtraPotionOnUpgrade, userData.ExtraPotionOnQuest, userData.ExtraGoldOnDiscovery, userData.DiscoveryCDReductionPercentage, userData.TraderDiscountPercentage, userData.ID]);
+		
+		globalQ.promise.then(function(resolvedThis){
+			//globalQ = $q.defer();
+			var update_user_query = 'UPDATE User_Table SET AmountOfGold = ?, CurrentLevel = ?, Rubys = ?, ChanceExtraPotionOnUpgrade = ?, ExtraPotionOnQuest = ?, ExtraGoldOnDiscovery = ?, DiscoveryCDReductionPercentage = ?, TraderDiscountPercentage = ? WHERE ID = ?';
+			resolvedThis.executeQuery(update_user_query, [userData.AmountOfGold, userData.CurrentLevel, userData.Rubys, userData.ChanceExtraPotionOnUpgrade, userData.ExtraPotionOnQuest, userData.ExtraGoldOnDiscovery, userData.DiscoveryCDReductionPercentage, userData.TraderDiscountPercentage, userData.ID]);
 
-        this.updateUserpotions($cordovaSQLite, userData);
-        this.updateSolvedQuests($cordovaSQLite, userData);
-        this.updateFoundDiscoveries($cordovaSQLite, userData);
-        this.updateUserDiscoveryData($cordovaSQLite, userData);
-        this.updateUserItems($cordovaSQLite, userData);
+			resolvedThis.updateUserpotions($cordovaSQLite, userData);
+			resolvedThis.updateSolvedQuests($cordovaSQLite, userData);
+			resolvedThis.updateFoundDiscoveries($cordovaSQLite, userData);
+			resolvedThis.updateUserDiscoveryData($cordovaSQLite, userData);
+			resolvedThis.updateUserItems($cordovaSQLite, userData);
+			//globalQ.resolve(resolvedThis);
+		});
     };
 
     return this;

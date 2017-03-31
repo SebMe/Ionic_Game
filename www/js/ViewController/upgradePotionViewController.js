@@ -6,8 +6,10 @@ myApp.controller('upgradePotionViewController', function ($scope, $cordovaSQLite
             $scope.userOwnedPotions = user.OwnedPotions;
 
             $scope.listPopup = $ionicPopup.show({
-                template: '<ion-list>                                ' +
-                        '  <ion-item ng-repeat="potion in userOwnedPotions" ng-click = "potionSelected(potion)"> ' +
+                template: 
+						'<style>.popup {min-width:50%;}</style>'+
+						'<ion-list>                                ' +
+                        '  <ion-item ng-show="potion.Amount" ng-repeat="potion in userOwnedPotions | orderBy:[\'Class\', \'Rank\'] " ng-click = "potionSelected(potion)"> ' +
                         '    <img src="img/{{potion.ImageFilename}}">' +
                         '     <h2> <span style="color:{{amountColor || black}};">{{potion.Amount}}</span> {{potion.Name}}</h2>' +
                         '     <p>{{potion.Description}}</p>' +
@@ -84,7 +86,7 @@ myApp.controller('upgradePotionViewController', function ($scope, $cordovaSQLite
             };
 
 
-            $scope.selectedPotionImage = 'UnselectedPotion.png';
+		$scope.selectedPotionImage = 'graphics/potions/rankupSlot.png';
             $scope.resultPotionImageFilename = null;
             $scope.okImageFilename = null;
             databaseFunctions.updateAllUserData($cordovaSQLite, user);
@@ -92,8 +94,8 @@ myApp.controller('upgradePotionViewController', function ($scope, $cordovaSQLite
            
             var resultPopup = $ionicPopup.show({
                 template:
-                        '<style>.popup {min-width:30%;}</style>'+
-                        '<img src="img/{{upgradedPotionToAdd.ImageFilename}}" style="margin-left:15%;">',
+                        '<style>.popup {min-width:80%;}</style>'+
+                        '<img src="img/{{upgradedPotionToAdd.ImageFilename}}" style="margin-right:60%;">',
 
                 title: '<h1> +'+$scope.resultAmount+' </h1>',
                 scope: $scope
